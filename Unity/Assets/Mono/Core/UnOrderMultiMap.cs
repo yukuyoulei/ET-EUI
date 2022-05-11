@@ -34,7 +34,7 @@ namespace ET
 			}
 			if (list.Count == 0)
 			{
-				base.Remove(t);
+				this.Remove(t);
 				MonoPool.Instance.Recycle(list);
 			}
 			return true;

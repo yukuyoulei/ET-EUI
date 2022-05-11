@@ -5,14 +5,14 @@ namespace ET
     [FriendClass(typeof(XunLuoPathComponent))]
     public static class XunLuoPathComponentSystem
     {
-        public static Vector3 GetCurrent(this XunLuoPathComponent self)
+        public static Vector3 GetCurrent(this XunLuoPathComponent me)
         {
-            return self.path[self.Index];
+            return me.path[me.Index];
         }
         
-        public static void MoveNext(this XunLuoPathComponent self)
+        public static void MoveNext(this XunLuoPathComponent me)
         {
-            self.Index = ++self.Index % self.path.Length;
+            me.Index = ++me.Index % me.path.Length;
         }
     }
 }

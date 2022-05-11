@@ -7,15 +7,15 @@ namespace ET
     [Timer(TimerType.MoveTimer)]
     public class MoveTimer: ATimer<MoveComponent>
     {
-        public override void Run(MoveComponent self)
+        public override void Run(MoveComponent me)
         {
             try
             {
-                self.MoveForward(false);
+                me.MoveForward(false);
             }
             catch (Exception e)
             {
-                Log.Error($"move timer error: {self.Id}\n{e}");
+                Log.Error($"move timer error: {me.Id}\n{e}");
             }
         }
     }
@@ -23,40 +23,40 @@ namespace ET
     [ObjectSystem]
     public class MoveComponentDestroySystem: DestroySystem<MoveComponent>
     {
-        public override void Destroy(MoveComponent self)
+        public override void Destroy(MoveComponent me)
         {
-            self.Clear();
+            me.Clear();
         }
     }
 
     [ObjectSystem]
     public class MoveComponentAwakeSystem: AwakeSystem<MoveComponent>
     {
-        public override void Awake(MoveComponent self)
+        public override void Awake(MoveComponent me)
         {
-            self.StartTime = 0;
-            self.StartPos = Vector3.zero;
-            self.NeedTime = 0;
-            self.MoveTimer = 0;
-            self.Callback = null;
-            self.Targets.Clear();
-            self.Speed = 0;
-            self.N = 0;
-            self.TurnTime = 0;
+            me.StartTime = 0;
+            me.StartPos = Vector3.zero;
+            me.NeedTime = 0;
+            me.MoveTimer = 0;
+            me.Callback = null;
+            me.Targets.Clear();
+            me.Speed = 0;
+            me.N = 0;
+            me.TurnTime = 0;
         }
     }
 
     [FriendClass(typeof(MoveComponent))]
     public static class MoveComponentSystem
     {
-        public static bool IsArrived(this MoveComponent self)
+        public static bool IsArrived(this MoveComponent me)
         {
-            return self.Targets.Count == 0;
+            return me.Targets.Count == 0;
         }
 
-        public static bool ChangeSpeed(this MoveComponent self, float speed)
+        public static bool ChangeSpeed(this MoveComponent me, float speed)
         {
-            if (self.IsArrived())
+            if (me.IsArrived())
             {
                 return false;
             }
@@ -66,44 +66,44 @@ namespace ET
                 return false;
             }
             
-            Unit unit = self.GetParent<Unit>();
+            Unit unit = me.GetParent<Unit>();
 
             using (ListComponent<Vector3> path = ListComponent<Vector3>.Create())
             {
-                self.MoveForward(true);
+                me.MoveForward(true);
                 
                 path.Add(unit.Position); // 第一个是Unit的pos
-                for (int i = self.N; i < self.Targets.Count; ++i)
+                for (int i = me.N; i < me.Targets.Count; ++i)
                 {
-                    path.Add(self.Targets[i]);
+                    path.Add(me.Targets[i]);
                 }
-                self.MoveToAsync(path, speed).Coroutine();
+                me.MoveToAsync(path, speed).Coroutine();
             }
             return true;
         }
 
-        public static async ETTask<bool> MoveToAsync(this MoveComponent self, List<Vector3> target, float speed, int turnTime = 100, ETCancellationToken cancellationToken = null)
+        public static async ETTask<bool> MoveToAsync(this MoveComponent me, List<Vector3> target, float speed, int turnTime = 100, ETCancellationToken cancellationToken = null)
         {
-            self.Stop();
+            me.Stop();
 
             foreach (Vector3 v in target)
             {
-                self.Targets.Add(v);
+                me.Targets.Add(v);
             }
 
-            self.IsTurnHorizontal = true;
-            self.TurnTime = turnTime;
-            self.Speed = speed;
+            me.IsTurnHorizontal = true;
+            me.TurnTime = turnTime;
+            me.Speed = speed;
             ETTask<bool> tcs = ETTask<bool>.Create(true);
-            self.Callback = (ret) => { tcs.SetResult(ret); };
+            me.Callback = (ret) => { tcs.SetResult(ret); };
 
-            Game.EventSystem.Publish(new EventType.MoveStart(){Unit = self.GetParent<Unit>()});
+            Game.EventSystem.Publish(new EventType.MoveStart(){Unit = me.GetParent<Unit>()});
             
-            self.StartMove();
+            me.StartMove();
             
             void CancelAction()
             {
-                self.Stop();
+                me.Stop();
             }
             
             bool moveRet;
@@ -119,17 +119,17 @@ namespace ET
 
             if (moveRet)
             {
-                Game.EventSystem.Publish(new EventType.MoveStop(){Unit = self.GetParent<Unit>()});
+                Game.EventSystem.Publish(new EventType.MoveStop(){Unit = me.GetParent<Unit>()});
             }
             return moveRet;
         }
 
-        public static void MoveForward(this MoveComponent self, bool needCancel)
+        public static void MoveForward(this MoveComponent me, bool needCancel)
         {
-            Unit unit = self.GetParent<Unit>();
+            Unit unit = me.GetParent<Unit>();
             
             long timeNow = TimeHelper.ClientNow();
-            long moveTime = timeNow - self.StartTime;
+            long moveTime = timeNow - me.StartTime;
 
             while (true)
             {
@@ -139,34 +139,34 @@ namespace ET
                 }
                 
                 // 计算位置插值
-                if (moveTime >= self.NeedTime)
+                if (moveTime >= me.NeedTime)
                 {
-                    unit.Position = self.NextTarget;
-                    if (self.TurnTime > 0)
+                    unit.Position = me.NextTarget;
+                    if (me.TurnTime > 0)
                     {
-                        unit.Rotation = self.To;
+                        unit.Rotation = me.To;
                     }
                 }
                 else
                 {
                     // 计算位置插值
-                    float amount = moveTime * 1f / self.NeedTime;
+                    float amount = moveTime * 1f / me.NeedTime;
                     if (amount > 0)
                     {
-                        Vector3 newPos = Vector3.Lerp(self.StartPos, self.NextTarget, amount);
+                        Vector3 newPos = Vector3.Lerp(me.StartPos, me.NextTarget, amount);
                         unit.Position = newPos;
                     }
                     
                     // 计算方向插值
-                    if (self.TurnTime > 0)
+                    if (me.TurnTime > 0)
                     {
-                        amount = moveTime * 1f / self.TurnTime;
-                        Quaternion q = Quaternion.Slerp(self.From, self.To, amount);
+                        amount = moveTime * 1f / me.TurnTime;
+                        Quaternion q = Quaternion.Slerp(me.From, me.To, amount);
                         unit.Rotation = q;
                     }
                 }
 
-                moveTime -= self.NeedTime;
+                moveTime -= me.NeedTime;
 
                 // 表示这个点还没走完，等下一帧再来
                 if (moveTime < 0)
@@ -177,131 +177,131 @@ namespace ET
                 // 到这里说明这个点已经走完
                 
                 // 如果是最后一个点
-                if (self.N >= self.Targets.Count - 1)
+                if (me.N >= me.Targets.Count - 1)
                 {
-                    unit.Position = self.NextTarget;
-                    unit.Rotation = self.To;
+                    unit.Position = me.NextTarget;
+                    unit.Rotation = me.To;
 
-                    Action<bool> callback = self.Callback;
-                    self.Callback = null;
+                    Action<bool> callback = me.Callback;
+                    me.Callback = null;
 
-                    self.Clear();
+                    me.Clear();
                     callback?.Invoke(!needCancel);
                     return;
                 }
 
-                self.SetNextTarget();
+                me.SetNextTarget();
             }
         }
 
-        private static void StartMove(this MoveComponent self)
+        private static void StartMove(this MoveComponent me)
         {
-            Unit unit = self.GetParent<Unit>();
+            Unit unit = me.GetParent<Unit>();
             
-            self.BeginTime = TimeHelper.ClientNow();
-            self.StartTime = self.BeginTime;
-            self.SetNextTarget();
+            me.BeginTime = TimeHelper.ClientNow();
+            me.StartTime = me.BeginTime;
+            me.SetNextTarget();
 
-            self.MoveTimer = TimerComponent.Instance.NewFrameTimer(TimerType.MoveTimer, self);
+            me.MoveTimer = TimerComponent.Instance.NewFrameTimer(TimerType.MoveTimer, me);
         }
 
-        private static void SetNextTarget(this MoveComponent self)
+        private static void SetNextTarget(this MoveComponent me)
         {
 
-            Unit unit = self.GetParent<Unit>();
+            Unit unit = me.GetParent<Unit>();
 
-            ++self.N;
+            ++me.N;
 
             // 时间计算用服务端的位置, 但是移动要用客户端的位置来插值
-            Vector3 v = self.GetFaceV();
+            Vector3 v = me.GetFaceV();
             float distance = v.magnitude;
             
             // 插值的起始点要以unit的真实位置来算
-            self.StartPos = unit.Position;
+            me.StartPos = unit.Position;
 
-            self.StartTime += self.NeedTime;
+            me.StartTime += me.NeedTime;
             
-            self.NeedTime = (long) (distance / self.Speed * 1000);
+            me.NeedTime = (long) (distance / me.Speed * 1000);
 
             
-            if (self.TurnTime > 0)
+            if (me.TurnTime > 0)
             {
                 // 要用unit的位置
-                Vector3 faceV = self.GetFaceV();
+                Vector3 faceV = me.GetFaceV();
                 if (faceV.sqrMagnitude < 0.0001f)
                 {
                     return;
                 }
-                self.From = unit.Rotation;
+                me.From = unit.Rotation;
                 
-                if (self.IsTurnHorizontal)
+                if (me.IsTurnHorizontal)
                 {
                     faceV.y = 0;
                 }
 
                 if (Math.Abs(faceV.x) > 0.01 || Math.Abs(faceV.z) > 0.01)
                 {
-                    self.To = Quaternion.LookRotation(faceV, Vector3.up);
+                    me.To = Quaternion.LookRotation(faceV, Vector3.up);
                 }
 
                 return;
             }
             
-            if (self.TurnTime == 0) // turn time == 0 立即转向
+            if (me.TurnTime == 0) // turn time == 0 立即转向
             {
-                Vector3 faceV = self.GetFaceV();
-                if (self.IsTurnHorizontal)
+                Vector3 faceV = me.GetFaceV();
+                if (me.IsTurnHorizontal)
                 {
                     faceV.y = 0;
                 }
 
                 if (Math.Abs(faceV.x) > 0.01 || Math.Abs(faceV.z) > 0.01)
                 {
-                    self.To = Quaternion.LookRotation(faceV, Vector3.up);
-                    unit.Rotation = self.To;
+                    me.To = Quaternion.LookRotation(faceV, Vector3.up);
+                    unit.Rotation = me.To;
                 }
             }
         }
 
-        private static Vector3 GetFaceV(this MoveComponent self)
+        private static Vector3 GetFaceV(this MoveComponent me)
         {
-            return self.NextTarget - self.PreTarget;
+            return me.NextTarget - me.PreTarget;
         }
 
-        public static bool FlashTo(this MoveComponent self, Vector3 target)
+        public static bool FlashTo(this MoveComponent me, Vector3 target)
         {
-            Unit unit = self.GetParent<Unit>();
+            Unit unit = me.GetParent<Unit>();
             unit.Position = target;
             return true;
         }
 
-        public static void Stop(this MoveComponent self)
+        public static void Stop(this MoveComponent me)
         {
-            if (self.Targets.Count > 0)
+            if (me.Targets.Count > 0)
             {
-                self.MoveForward(true);
+                me.MoveForward(true);
             }
 
-            self.Clear();
+            me.Clear();
         }
 
-        public static void Clear(this MoveComponent self)
+        public static void Clear(this MoveComponent me)
         {
-            self.StartTime = 0;
-            self.StartPos = Vector3.zero;
-            self.BeginTime = 0;
-            self.NeedTime = 0;
-            TimerComponent.Instance?.Remove(ref self.MoveTimer);
-            self.Targets.Clear();
-            self.Speed = 0;
-            self.N = 0;
-            self.TurnTime = 0;
-            self.IsTurnHorizontal = false;
+            me.StartTime = 0;
+            me.StartPos = Vector3.zero;
+            me.BeginTime = 0;
+            me.NeedTime = 0;
+            TimerComponent.Instance?.Remove(ref me.MoveTimer);
+            me.Targets.Clear();
+            me.Speed = 0;
+            me.N = 0;
+            me.TurnTime = 0;
+            me.IsTurnHorizontal = false;
 
-            if (self.Callback != null)
+            if (me.Callback != null)
             {
-                Action<bool> callback = self.Callback;
-                self.Callback = null;
+                Action<bool> callback = me.Callback;
+                me.Callback = null;
                 callback.Invoke(false);
             }
         }

@@ -189,17 +189,17 @@ namespace ILRuntime.Mono.Cecil {
 
 	static partial class Mixin {
 
-		public static bool IsVarArg (this IMethodSignature self)
+		public static bool IsVarArg (this IMethodSignature me)
 		{
-			return self.CallingConvention == MethodCallingConvention.VarArg;
+			return me.CallingConvention == MethodCallingConvention.VarArg;
 		}
 
-		public static int GetSentinelPosition (this IMethodSignature self)
+		public static int GetSentinelPosition (this IMethodSignature me)
 		{
-			if (!self.HasParameters)
+			if (!me.HasParameters)
 				return -1;
 
-			var parameters = self.Parameters;
+			var parameters = me.Parameters;
 			for (int i = 0; i < parameters.Count; i++)
 				if (parameters [i].ParameterType.IsSentinel)
 					return i;

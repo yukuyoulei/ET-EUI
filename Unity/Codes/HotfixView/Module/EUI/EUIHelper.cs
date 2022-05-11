@@ -122,7 +122,7 @@ namespace ET
 
         
         
-        public static void RemoveUIScrollItems<K,T>(this K self, ref Dictionary<int, T> dictionary) where K : Entity,IUILogic  where T : Entity,IUIScrollItem
+        public static void RemoveUIScrollItems<K,T>(this K me, ref Dictionary<int, T> dictionary) where K : Entity,IUILogic  where T : Entity,IUIScrollItem
         {
             if (dictionary == null)
             {
@@ -210,12 +210,12 @@ namespace ET
         /// <summary>
         /// 注册窗口关闭事件
         /// </summary>
-        /// <OtherParam name="self"></OtherParam>
+        /// <OtherParam name="me"></OtherParam>
         /// <OtherParam name="closeButton"></OtherParam>
-        public static void RegisterCloseEvent<T>(this Entity self,Button closeButton)  where T : Entity,IAwake,IUILogic
+        public static void RegisterCloseEvent<T>(this Entity me,Button closeButton)  where T : Entity,IAwake,IUILogic
         {
             closeButton.onClick.RemoveAllListeners();
-            closeButton.onClick.AddListener(() => { self.DomainScene().GetComponent<UIComponent>().HideWindow(self.GetParent<UIBaseWindow>().WindowID); });
+            closeButton.onClick.AddListener(() => { me.DomainScene().GetComponent<UIComponent>().HideWindow(me.GetParent<UIBaseWindow>().WindowID); });
         }
         #endregion
         

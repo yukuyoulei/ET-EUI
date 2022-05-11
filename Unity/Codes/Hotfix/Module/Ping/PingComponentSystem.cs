@@ -5,19 +5,19 @@ namespace ET
     [ObjectSystem]
     public class PingComponentAwakeSystem: AwakeSystem<PingComponent>
     {
-        public override void Awake(PingComponent self)
+        public override void Awake(PingComponent me)
         {
-            PingAsync(self).Coroutine();
+            PingAsync(me).Coroutine();
         }
 
-        private static async ETTask PingAsync(PingComponent self)
+        private static async ETTask PingAsync(PingComponent me)
         {
-            Session session = self.GetParent<Session>();
-            long instanceId = self.InstanceId;
+            Session session = me.GetParent<Session>();
+            long instanceId = me.InstanceId;
             
             while (true)
             {
-                if (self.InstanceId != instanceId)
+                if (me.InstanceId != instanceId)
                 {
                     return;
                 }
@@ -25,15 +25,15 @@ namespace ET
                 long time1 = TimeHelper.ClientNow();
                 try
                 {
-                    G2C_Ping response = await session.Call(self.C2G_Ping) as G2C_Ping;
+                    G2C_Ping response = await session.Call(me.C2G_Ping) as G2C_Ping;
 
-                    if (self.InstanceId != instanceId)
+                    if (me.InstanceId != instanceId)
                     {
                         return;
                     }
 
                     long time2 = TimeHelper.ClientNow();
-                    self.Ping = time2 - time1;
+                    me.Ping = time2 - time1;
                     
                     Game.TimeInfo.ServerMinusClientTime = response.Time + (time2 - time1) / 2 - time2;
 
@@ -42,7 +42,7 @@ namespace ET
                 catch (RpcException e)
                 {
                     // session断开导致ping rpc报错，记录一下即可，不需要打成error
-                    Log.Info($"ping error: {self.Id} {e.Error}");
+                    Log.Info($"ping error: {me.Id} {e.Error}");
                     return;
                 }
                 catch (Exception e)
@@ -56,9 +56,9 @@ namespace ET
     [ObjectSystem]
     public class PingComponentDestroySystem: DestroySystem<PingComponent>
     {
-        public override void Destroy(PingComponent self)
+        public override void Destroy(PingComponent me)
         {
-            self.Ping = default;
+            me.Ping = default;
         }
     }
 }

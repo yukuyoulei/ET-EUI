@@ -27,18 +27,18 @@ namespace ET
         [ObjectSystem]
         public class ObjectWaitAwakeSystem: AwakeSystem<ObjectWait>
         {
-            public override void Awake(ObjectWait self)
+            public override void Awake(ObjectWait me)
             {
-                self.tcss.Clear();
+                me.tcss.Clear();
             }
         }
 
         [ObjectSystem]
         public class ObjectWaitDestroySystem: DestroySystem<ObjectWait>
         {
-            public override void Destroy(ObjectWait self)
+            public override void Destroy(ObjectWait me)
             {
-                foreach (object v in self.tcss.Values.ToArray())
+                foreach (object v in me.tcss.Values.ToArray())
                 {
                     ((IDestroyRun) v).SetResult();
                 }
@@ -84,15 +84,15 @@ namespace ET
             }
         }
         
-        public static async ETTask<T> Wait<T>(this ObjectWait self, ETCancellationToken cancellationToken = null) where T : struct, IWaitType
+        public static async ETTask<T> Wait<T>(this ObjectWait me, ETCancellationToken cancellationToken = null) where T : struct, IWaitType
         {
             ResultCallback<T> tcs = new ResultCallback<T>();
             Type type = typeof (T);
-            self.tcss.Add(type, tcs);
+            me.tcss.Add(type, tcs);
 
             void CancelAction()
             {
-                self.Notify(new T() { Error = WaitTypeError.Cancel });
+                me.Notify(new T() { Error = WaitTypeError.Cancel });
             }
 
             T ret;
@@ -108,7 +108,7 @@ namespace ET
             return ret;
         }
 
-        public static async ETTask<T> Wait<T>(this ObjectWait self, int timeout, ETCancellationToken cancellationToken = null) where T : struct, IWaitType
+        public static async ETTask<T> Wait<T>(this ObjectWait me, int timeout, ETCancellationToken cancellationToken = null) where T : struct, IWaitType
         {
             ResultCallback<T> tcs = new ResultCallback<T>();
             async ETTask WaitTimeout()
@@ -122,16 +122,16 @@ namespace ET
                 {
                     return;
                 }
-                self.Notify(new T() { Error = WaitTypeError.Timeout });
+                me.Notify(new T() { Error = WaitTypeError.Timeout });
             }
             
             WaitTimeout().Coroutine();
             
-            self.tcss.Add(typeof (T), tcs);
+            me.tcss.Add(typeof (T), tcs);
             
             void CancelAction()
             {
-                self.Notify(new T() { Error = WaitTypeError.Cancel });
+                me.Notify(new T() { Error = WaitTypeError.Cancel });
             }
             
             T ret;
@@ -147,15 +147,15 @@ namespace ET
             return ret;
         }
 
-        public static void Notify<T>(this ObjectWait self, T obj) where T : struct, IWaitType
+        public static void Notify<T>(this ObjectWait me, T obj) where T : struct, IWaitType
         {
             Type type = typeof (T);
-            if (!self.tcss.TryGetValue(type, out object tcs))
+            if (!me.tcss.TryGetValue(type, out object tcs))
             {
                 return;
             }
 
-            self.tcss.Remove(type);
+            me.tcss.Remove(type);
             ((ResultCallback<T>) tcs).SetResult(obj);
         }
     }

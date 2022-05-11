@@ -22,7 +22,7 @@ namespace ILRuntime.Mono.Cecil {
 		internal static object NotResolved = new object ();
 
 		public static void ResolveConstant (
-			this IConstantProvider self,
+			this IConstantProvider me,
 			ref object constant,
 			ModuleDefinition module)
 		{
@@ -35,7 +35,7 @@ namespace ILRuntime.Mono.Cecil {
 				if (constant != Mixin.NotResolved)
 					return;
 				if (module.HasImage ())
-					constant = module.Read (self, (provider, reader) => reader.ReadConstant (provider));
+					constant = module.Read (me, (provider, reader) => reader.ReadConstant (provider));
 				else
 					constant = Mixin.NoValue;
 			}

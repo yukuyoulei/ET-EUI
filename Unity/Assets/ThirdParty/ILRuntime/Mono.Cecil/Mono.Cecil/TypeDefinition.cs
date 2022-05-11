@@ -587,9 +587,9 @@ namespace ILRuntime.Mono.Cecil {
 
 	static partial class Mixin {
 
-		public static TypeReference GetEnumUnderlyingType (this TypeDefinition self)
+		public static TypeReference GetEnumUnderlyingType (this TypeDefinition me)
 		{
-			var fields = self.Fields;
+			var fields = me.Fields;
 
 			for (int i = 0; i < fields.Count; i++) {
 				var field = fields [i];
@@ -600,12 +600,12 @@ namespace ILRuntime.Mono.Cecil {
 			throw new ArgumentException ();
 		}
 
-		public static TypeDefinition GetNestedType (this TypeDefinition self, string fullname)
+		public static TypeDefinition GetNestedType (this TypeDefinition me, string fullname)
 		{
-			if (!self.HasNestedTypes)
+			if (!me.HasNestedTypes)
 				return null;
 
-			var nested_types = self.NestedTypes;
+			var nested_types = me.NestedTypes;
 
 			for (int i = 0; i < nested_types.Count; i++) {
 				var nested_type = nested_types [i];

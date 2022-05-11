@@ -39,11 +39,11 @@ namespace ILRuntime.Mono.Cecil {
 			return integer;
 		}
 
-		public static MetadataToken GetMetadataToken (this CodedIndex self, uint data)
+		public static MetadataToken GetMetadataToken (this CodedIndex me, uint data)
 		{
 			uint rid;
 			TokenType token_type;
-			switch (self) {
+			switch (me) {
 			case CodedIndex.TypeDefOrRef:
 				rid = data >> 2;
 				switch (data & 3) {
@@ -300,12 +300,12 @@ namespace ILRuntime.Mono.Cecil {
 			return MetadataToken.Zero;
 		}
 
-		public static uint CompressMetadataToken (this CodedIndex self, MetadataToken token)
+		public static uint CompressMetadataToken (this CodedIndex me, MetadataToken token)
 		{
 			uint ret = 0;
 			if (token.RID == 0)
 				return ret;
-			switch (self) {
+			switch (me) {
 			case CodedIndex.TypeDefOrRef:
 				ret = token.RID << 2;
 				switch (token.TokenType) {
@@ -561,12 +561,12 @@ namespace ILRuntime.Mono.Cecil {
 			throw new ArgumentException ();
 		}
 
-		public static int GetSize (this CodedIndex self, Func<Table, int> counter)
+		public static int GetSize (this CodedIndex me, Func<Table, int> counter)
 		{
 			int bits;
 			Table [] tables;
 
-			switch (self) {
+			switch (me) {
 			case CodedIndex.TypeDefOrRef:
 				bits = 2;
 				tables = new [] { Table.TypeDef, Table.TypeRef, Table.TypeSpec };

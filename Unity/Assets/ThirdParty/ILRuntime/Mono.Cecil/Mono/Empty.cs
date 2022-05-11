@@ -31,32 +31,32 @@ namespace ILRuntime.Mono.Cecil {
 
 	static partial class Mixin {
 
-		public static bool IsNullOrEmpty<T> (this T [] self)
+		public static bool IsNullOrEmpty<T> (this T [] me)
 		{
-			return self == null || self.Length == 0;
+			return me == null || me.Length == 0;
 		}
 
-		public static bool IsNullOrEmpty<T> (this Collection<T> self)
+		public static bool IsNullOrEmpty<T> (this Collection<T> me)
 		{
-			return self == null || self.size == 0;
+			return me == null || me.size == 0;
 		}
 
-		public static T [] Resize<T> (this T [] self, int length)
+		public static T [] Resize<T> (this T [] me, int length)
 		{
-			Array.Resize (ref self, length);
-			return self;
+			Array.Resize (ref me, length);
+			return me;
 		}
 
-		public static T [] Add<T> (this T [] self, T item)
+		public static T [] Add<T> (this T [] me, T item)
 		{
-			if (self == null) {
-				self = new [] { item };
-				return self;
+			if (me == null) {
+				me = new [] { item };
+				return me;
 			}
 
-			self = self.Resize (self.Length + 1);
-			self [self.Length - 1] = item;
-			return self;
+			me = me.Resize (me.Length + 1);
+			me [me.Length - 1] = item;
+			return me;
 		}
 	}
 }

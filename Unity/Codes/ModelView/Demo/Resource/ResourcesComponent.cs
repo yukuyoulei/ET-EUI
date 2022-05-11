@@ -13,37 +13,37 @@ namespace ET
         [ObjectSystem]
         public class ABInfoAwakeSystem: AwakeSystem<ABInfo, string, AssetBundle>
         {
-            public override void Awake(ABInfo self, string abName, AssetBundle a)
+            public override void Awake(ABInfo me, string abName, AssetBundle a)
             {
-                self.AssetBundle = a;
-                self.Name = abName;
-                self.RefCount = 1;
-                self.AlreadyLoadAssets = false;
+                me.AssetBundle = a;
+                me.Name = abName;
+                me.RefCount = 1;
+                me.AlreadyLoadAssets = false;
             }
         }
 
         [ObjectSystem]
         public class ABInfoDestroySystem: DestroySystem<ABInfo>
         {
-            public override void Destroy(ABInfo self)
+            public override void Destroy(ABInfo me)
             {
-                //Log.Debug($"desdroy assetbundle: {self.Name}");
+                //Log.Debug($"desdroy assetbundle: {me.Name}");
 
-                self.RefCount = 0;
-                self.Name = "";
-                self.AlreadyLoadAssets = false;
-                self.AssetBundle = null;
+                me.RefCount = 0;
+                me.Name = "";
+                me.AlreadyLoadAssets = false;
+                me.AssetBundle = null;
             }
         }
         
-        public static void Destroy(this ABInfo self, bool unload = true)
+        public static void Destroy(this ABInfo me, bool unload = true)
         {
-            if (self.AssetBundle != null)
+            if (me.AssetBundle != null)
             {
-                self.AssetBundle.Unload(unload);
+                me.AssetBundle.Unload(unload);
             }
 
-            self.Dispose();
+            me.Dispose();
         }
     }
 
@@ -132,14 +132,14 @@ namespace ET
         [ObjectSystem]
         public class ResourcesComponentAwakeSystem: AwakeSystem<ResourcesComponent>
         {
-            public override void Awake(ResourcesComponent self)
+            public override void Awake(ResourcesComponent me)
             {
-                ResourcesComponent.Instance = self;
+                ResourcesComponent.Instance = me;
 
                 if (Define.IsAsync)
                 {
-                    self.LoadOneBundle("StreamingAssets");
-                    self.AssetBundleManifestObject = (AssetBundleManifest)self.GetAsset("StreamingAssets", "AssetBundleManifest");
+                    me.LoadOneBundle("StreamingAssets");
+                    me.AssetBundleManifestObject = (AssetBundleManifest)me.GetAsset("StreamingAssets", "AssetBundleManifest");
                 }
             }
         }
@@ -147,27 +147,27 @@ namespace ET
         [ObjectSystem]
         public class ResourcesComponentDestroySystem: DestroySystem<ResourcesComponent>
         {
-            public override void Destroy(ResourcesComponent self)
+            public override void Destroy(ResourcesComponent me)
             {
                 ResourcesComponent.Instance = null;
 
-                foreach (var abInfo in self.bundles)
+                foreach (var abInfo in me.bundles)
                 {
                     abInfo.Value.Destroy();
                 }
 
-                self.bundles.Clear();
-                self.resourceCache.Clear();
-                self.IntToStringDict.Clear();
-                self.StringToABDict.Clear();
-                self.BundleNameToLowerDict.Clear();
+                me.bundles.Clear();
+                me.resourceCache.Clear();
+                me.IntToStringDict.Clear();
+                me.StringToABDict.Clear();
+                me.BundleNameToLowerDict.Clear();
             }
         }
 
-        private static string[] GetDependencies(this ResourcesComponent self, string assetBundleName)
+        private static string[] GetDependencies(this ResourcesComponent me, string assetBundleName)
         {
             string[] dependencies = Array.Empty<string>();
-            if (self.DependenciesCache.TryGetValue(assetBundleName, out dependencies))
+            if (me.DependenciesCache.TryGetValue(assetBundleName, out dependencies))
             {
                 return dependencies;
             }
@@ -181,26 +181,26 @@ namespace ET
             }
             else
             {
-                dependencies = self.AssetBundleManifestObject.GetAllDependencies(assetBundleName);
+                dependencies = me.AssetBundleManifestObject.GetAllDependencies(assetBundleName);
             }
 
-            self.DependenciesCache.Add(assetBundleName, dependencies);
+            me.DependenciesCache.Add(assetBundleName, dependencies);
             return dependencies;
         }
 
-        private static string[] GetSortedDependencies(this ResourcesComponent self, string assetBundleName)
+        private static string[] GetSortedDependencies(this ResourcesComponent me, string assetBundleName)
         {
             var info = new Dictionary<string, int>();
             var parents = new List<string>();
-            self.CollectDependencies(parents, assetBundleName, info);
+            me.CollectDependencies(parents, assetBundleName, info);
             string[] ss = info.OrderBy(x => x.Value).Select(x => x.Key).ToArray();
             return ss;
         }
 
-        private static void CollectDependencies(this ResourcesComponent self, List<string> parents, string assetBundleName, Dictionary<string, int> info)
+        private static void CollectDependencies(this ResourcesComponent me, List<string> parents, string assetBundleName, Dictionary<string, int> info)
         {
             parents.Add(assetBundleName);
-            string[] deps = self.GetDependencies(assetBundleName);
+            string[] deps = me.GetDependencies(assetBundleName);
             foreach (string parent in parents)
             {
                 if (!info.ContainsKey(parent))
@@ -218,7 +218,7 @@ namespace ET
                     throw new Exception($"包有循环依赖，请重新标记: {assetBundleName} {dep}");
                 }
 
-                self.CollectDependencies(parents, dep, info);
+                me.CollectDependencies(parents, dep, info);
             }
 
             parents.RemoveAt(parents.Count - 1);
@@ -226,15 +226,15 @@ namespace ET
 
 
 
-        public static bool Contains(this ResourcesComponent self, string bundleName)
+        public static bool Contains(this ResourcesComponent me, string bundleName)
         {
-            return self.bundles.ContainsKey(bundleName);
+            return me.bundles.ContainsKey(bundleName);
         }
 
-        public static Dictionary<string, UnityEngine.Object> GetBundleAll(this ResourcesComponent self, string bundleName)
+        public static Dictionary<string, UnityEngine.Object> GetBundleAll(this ResourcesComponent me, string bundleName)
         {
             Dictionary<string, UnityEngine.Object> dict;
-            if (!self.resourceCache.TryGetValue(bundleName.BundleNameToLower(), out dict))
+            if (!me.resourceCache.TryGetValue(bundleName.BundleNameToLower(), out dict))
             {
                 throw new Exception($"not found asset: {bundleName}");
             }
@@ -242,10 +242,10 @@ namespace ET
             return dict;
         }
 
-        public static UnityEngine.Object GetAsset(this ResourcesComponent self, string bundleName, string prefab)
+        public static UnityEngine.Object GetAsset(this ResourcesComponent me, string bundleName, string prefab)
         {
             Dictionary<string, UnityEngine.Object> dict;
-            if (!self.resourceCache.TryGetValue(bundleName.BundleNameToLower(), out dict))
+            if (!me.resourceCache.TryGetValue(bundleName.BundleNameToLower(), out dict))
             {
                 throw new Exception($"not found asset: {bundleName} {prefab}");
             }
@@ -260,11 +260,11 @@ namespace ET
         }
 
         // 一帧卸载一个包，避免卡死
-        public static async ETTask UnloadBundleAsync(this ResourcesComponent self, string assetBundleName, bool unload = true)
+        public static async ETTask UnloadBundleAsync(this ResourcesComponent me, string assetBundleName, bool unload = true)
         {
             assetBundleName = assetBundleName.BundleNameToLower();
 
-            string[] dependencies = self.GetSortedDependencies(assetBundleName);
+            string[] dependencies = me.GetSortedDependencies(assetBundleName);
 
             //Log.Debug($"-----------dep unload start {assetBundleName} dep: {dependencies.ToList().ListToString()}");
             foreach (string dependency in dependencies)
@@ -273,7 +273,7 @@ namespace ET
                 try
                 {
                     coroutineLock = await CoroutineLockComponent.Instance.Wait(CoroutineLockType.Resources, assetBundleName.GetHashCode());
-                    self.UnloadOneBundle(dependency, unload);
+                    me.UnloadOneBundle(dependency, unload);
                     await TimerComponent.Instance.WaitFrameAsync();
                 }
                 finally
@@ -285,27 +285,27 @@ namespace ET
         }
 
         // 只允许场景设置unload为false
-        public static void UnloadBundle(this ResourcesComponent self, string assetBundleName, bool unload = true)
+        public static void UnloadBundle(this ResourcesComponent me, string assetBundleName, bool unload = true)
         {
             assetBundleName = assetBundleName.BundleNameToLower();
 
-            string[] dependencies = self.GetSortedDependencies(assetBundleName);
+            string[] dependencies = me.GetSortedDependencies(assetBundleName);
 
             //Log.Debug($"-----------dep unload start {assetBundleName} dep: {dependencies.ToList().ListToString()}");
             foreach (string dependency in dependencies)
             {
-                self.UnloadOneBundle(dependency, unload);
+                me.UnloadOneBundle(dependency, unload);
             }
 
             //Log.Debug($"-----------dep unload finish {assetBundleName} dep: {dependencies.ToList().ListToString()}");
         }
 
-        private static void UnloadOneBundle(this ResourcesComponent self, string assetBundleName, bool unload = true)
+        private static void UnloadOneBundle(this ResourcesComponent me, string assetBundleName, bool unload = true)
         {
             assetBundleName = assetBundleName.BundleNameToLower();
 
             ABInfo abInfo;
-            if (!self.bundles.TryGetValue(assetBundleName, out abInfo))
+            if (!me.bundles.TryGetValue(assetBundleName, out abInfo))
             {
                 return;
             }
@@ -320,10 +320,10 @@ namespace ET
             }
 
             //Log.Debug($"---------------truly unload one bundle {assetBundleName} refcount: {abInfo.RefCount}");
-            self.bundles.Remove(assetBundleName);
-            self.resourceCache.Remove(assetBundleName);
+            me.bundles.Remove(assetBundleName);
+            me.resourceCache.Remove(assetBundleName);
             abInfo.Destroy(unload);
-            // Log.Debug($"cache count: {self.cacheDictionary.Count}");
+            // Log.Debug($"cache count: {me.cacheDictionary.Count}");
         }
 
         /// <summary>
@@ -331,11 +331,11 @@ namespace ET
         /// </summary>
         /// <param name="assetBundleName"></param>
         /// <returns></returns>
-        public static void LoadBundle(this ResourcesComponent self, string assetBundleName)
+        public static void LoadBundle(this ResourcesComponent me, string assetBundleName)
         {
             assetBundleName = assetBundleName.ToLower();
 
-            string[] dependencies = self.GetSortedDependencies(assetBundleName);
+            string[] dependencies = me.GetSortedDependencies(assetBundleName);
             //Log.Debug($"-----------dep load start {assetBundleName} dep: {dependencies.ToList().ListToString()}");
             foreach (string dependency in dependencies)
             {
@@ -344,29 +344,29 @@ namespace ET
                     continue;
                 }
 
-                self.LoadOneBundle(dependency);
+                me.LoadOneBundle(dependency);
             }
 
             //Log.Debug($"-----------dep load finish {assetBundleName} dep: {dependencies.ToList().ListToString()}");
         }
 
-        private static void AddResource(this ResourcesComponent self, string bundleName, string assetName, UnityEngine.Object resource)
+        private static void AddResource(this ResourcesComponent me, string bundleName, string assetName, UnityEngine.Object resource)
         {
             Dictionary<string, UnityEngine.Object> dict;
-            if (!self.resourceCache.TryGetValue(bundleName.BundleNameToLower(), out dict))
+            if (!me.resourceCache.TryGetValue(bundleName.BundleNameToLower(), out dict))
             {
                 dict = new Dictionary<string, UnityEngine.Object>();
-                self.resourceCache[bundleName] = dict;
+                me.resourceCache[bundleName] = dict;
             }
 
             dict[assetName] = resource;
         }
 
-        private static void LoadOneBundle(this ResourcesComponent self, string assetBundleName)
+        private static void LoadOneBundle(this ResourcesComponent me, string assetBundleName)
         {
             assetBundleName = assetBundleName.BundleNameToLower();
             ABInfo abInfo;
-            if (self.bundles.TryGetValue(assetBundleName, out abInfo))
+            if (me.bundles.TryGetValue(assetBundleName, out abInfo))
             {
                 ++abInfo.RefCount;
                 //Log.Debug($"---------------load one bundle {assetBundleName} refcount: {abInfo.RefCount}");
@@ -383,13 +383,13 @@ namespace ET
                     {
                         string assetName = Path.GetFileNameWithoutExtension(s);
                         UnityEngine.Object resource = Define.LoadAssetAtPath(s);
-                        self.AddResource(assetBundleName, assetName, resource);
+                        me.AddResource(assetBundleName, assetName, resource);
                     }
 
                     if (realPath.Length > 0)
                     {
-                        abInfo = self.AddChild<ABInfo, string, AssetBundle>(assetBundleName, null);
-                        self.bundles[assetBundleName] = abInfo;
+                        abInfo = me.AddChild<ABInfo, string, AssetBundle>(assetBundleName, null);
+                        me.bundles[assetBundleName] = abInfo;
                         //Log.Debug($"---------------load one bundle {assetBundleName} refcount: {abInfo.RefCount}");
                     }
                     else
@@ -426,12 +426,12 @@ namespace ET
                 var assets = assetBundle.LoadAllAssets();
                 foreach (UnityEngine.Object asset in assets)
                 {
-                    self.AddResource(assetBundleName, asset.name, asset);
+                    me.AddResource(assetBundleName, asset.name, asset);
                 }
             }
 
-            abInfo = self.AddChild<ABInfo, string, AssetBundle>(assetBundleName, assetBundle);
-            self.bundles[assetBundleName] = abInfo;
+            abInfo = me.AddChild<ABInfo, string, AssetBundle>(assetBundleName, assetBundle);
+            me.bundles[assetBundleName] = abInfo;
 
             //Log.Debug($"---------------load one bundle {assetBundleName} refcount: {abInfo.RefCount}");
         }
@@ -439,11 +439,11 @@ namespace ET
         /// <summary>
         /// 异步加载assetbundle, 加载ab包分两部分，第一部分是从硬盘加载，第二部分加载all assets。两者不能同时并发
         /// </summary>
-        public static async ETTask LoadBundleAsync(this ResourcesComponent self, string assetBundleName)
+        public static async ETTask LoadBundleAsync(this ResourcesComponent me, string assetBundleName)
         {
             assetBundleName = assetBundleName.BundleNameToLower();
 
-            string[] dependencies = self.GetSortedDependencies(assetBundleName);
+            string[] dependencies = me.GetSortedDependencies(assetBundleName);
             //Log.Debug($"-----------dep load async start {assetBundleName} dep: {dependencies.ToList().ListToString()}");
 
             using (ListComponent<ABInfo> abInfos = ListComponent<ABInfo>.Create())
@@ -454,7 +454,7 @@ namespace ET
                     try
                     {
                         coroutineLock = await CoroutineLockComponent.Instance.Wait(CoroutineLockType.Resources, dependency.GetHashCode());
-                        ABInfo abInfo = await self.LoadOneBundleAsync(dependency);
+                        ABInfo abInfo = await me.LoadOneBundleAsync(dependency);
                         if (abInfo == null || abInfo.RefCount > 1)
                         {
                             return;
@@ -481,18 +481,18 @@ namespace ET
                     tasks.Clear();
                     foreach (ABInfo abInfo in abInfos)
                     {
-                        tasks.Add(self.LoadOneBundleAllAssets(abInfo));
+                        tasks.Add(me.LoadOneBundleAllAssets(abInfo));
                     }
                     await ETTaskHelper.WaitAll(tasks);
                 }
             }
         }
 
-        private static async ETTask<ABInfo> LoadOneBundleAsync(this ResourcesComponent self, string assetBundleName)
+        private static async ETTask<ABInfo> LoadOneBundleAsync(this ResourcesComponent me, string assetBundleName)
         {
             assetBundleName = assetBundleName.BundleNameToLower();
             ABInfo abInfo;
-            if (self.bundles.TryGetValue(assetBundleName, out abInfo))
+            if (me.bundles.TryGetValue(assetBundleName, out abInfo))
             {
                 ++abInfo.RefCount;
                 //Log.Debug($"---------------load one bundle {assetBundleName} refcount: {abInfo.RefCount}");
@@ -510,13 +510,13 @@ namespace ET
                     {
                         string assetName = Path.GetFileNameWithoutExtension(s);
                         UnityEngine.Object resource = Define.LoadAssetAtPath(s);
-                        self.AddResource(assetBundleName, assetName, resource);
+                        me.AddResource(assetBundleName, assetName, resource);
                     }
 
                     if (realPath.Length > 0)
                     {
-                        abInfo = self.AddChild<ABInfo, string, AssetBundle>(assetBundleName, null);
-                        self.bundles[assetBundleName] = abInfo;
+                        abInfo = me.AddChild<ABInfo, string, AssetBundle>(assetBundleName, null);
+                        me.bundles[assetBundleName] = abInfo;
                         //Log.Debug($"---------------load one bundle {assetBundleName} refcount: {abInfo.RefCount}");
                     }
                     else
@@ -549,14 +549,14 @@ namespace ET
                 Log.Warning($"assets bundle not found: {assetBundleName}");
                 return null;
             }
-            abInfo = self.AddChild<ABInfo, string, AssetBundle>(assetBundleName, assetBundle);
-            self.bundles[assetBundleName] = abInfo;
+            abInfo = me.AddChild<ABInfo, string, AssetBundle>(assetBundleName, assetBundle);
+            me.bundles[assetBundleName] = abInfo;
             return abInfo;
             //Log.Debug($"---------------load one bundle {assetBundleName} refcount: {abInfo.RefCount}");
         }
 
         // 加载ab包中的all assets
-        private static async ETTask LoadOneBundleAllAssets(this ResourcesComponent self, ABInfo abInfo)
+        private static async ETTask LoadOneBundleAllAssets(this ResourcesComponent me, ABInfo abInfo)
         {
             CoroutineLock coroutineLock = null;
             try
@@ -575,7 +575,7 @@ namespace ET
 
                     foreach (UnityEngine.Object asset in assets)
                     {
-                        self.AddResource(abInfo.Name, asset.name, asset);
+                        me.AddResource(abInfo.Name, asset.name, asset);
                     }
                 }
 
@@ -587,10 +587,10 @@ namespace ET
             }
         }
 
-        public static string DebugString(this ResourcesComponent self)
+        public static string DebugString(this ResourcesComponent me)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (ABInfo abInfo in self.bundles.Values)
+            foreach (ABInfo abInfo in me.bundles.Values)
             {
                 sb.Append($"{abInfo.Name}:{abInfo.RefCount}\n");
             }

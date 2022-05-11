@@ -5,19 +5,19 @@ namespace ET
     [ObjectSystem]
     public class UIEventComponentAwakeSystem : AwakeSystem<UIEventComponent>
     {
-        public override void Awake(UIEventComponent self)
+        public override void Awake(UIEventComponent me)
         {
-            UIEventComponent.Instance = self;
-            self.Awake();
+            UIEventComponent.Instance = me;
+            me.Awake();
         }
     }
     
     [ObjectSystem]
     public class UIEventComponentDestroySystem : DestroySystem<UIEventComponent>
     {
-        public override void Destroy(UIEventComponent self)
+        public override void Destroy(UIEventComponent me)
         {
-            self.UIEventHandlers.Clear();
+            me.UIEventHandlers.Clear();
             UIEventComponent.Instance = null;
         }
     }
@@ -25,19 +25,19 @@ namespace ET
     [FriendClass(typeof(UIEventComponent))]
     public static class UIEventComponentSystem
     {
-        public static void Awake(this UIEventComponent self)
+        public static void Awake(this UIEventComponent me)
         {
-            self.UIEventHandlers.Clear();
+            me.UIEventHandlers.Clear();
             foreach (Type v in Game.EventSystem.GetTypes(typeof (AUIEventAttribute)))
             {
                 AUIEventAttribute attr = v.GetCustomAttributes(typeof (AUIEventAttribute), false)[0] as AUIEventAttribute;
-                self.UIEventHandlers.Add(attr.WindowID, Activator.CreateInstance(v) as IAUIEventHandler);
+                me.UIEventHandlers.Add(attr.WindowID, Activator.CreateInstance(v) as IAUIEventHandler);
             }
         }
         
-        public static IAUIEventHandler GetUIEventHandler(this UIEventComponent self,WindowID windowID)
+        public static IAUIEventHandler GetUIEventHandler(this UIEventComponent me,WindowID windowID)
         {
-            if (self.UIEventHandlers.TryGetValue(windowID, out IAUIEventHandler handler))
+            if (me.UIEventHandlers.TryGetValue(windowID, out IAUIEventHandler handler))
             {
                 return handler;
             }

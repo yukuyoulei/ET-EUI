@@ -7,28 +7,28 @@ namespace ET
     [ObjectSystem]
     public class AIDispatcherComponentAwakeSystem: AwakeSystem<AIDispatcherComponent>
     {
-        public override void Awake(AIDispatcherComponent self)
+        public override void Awake(AIDispatcherComponent me)
         {
-            AIDispatcherComponent.Instance = self;
-            self.Load();
+            AIDispatcherComponent.Instance = me;
+            me.Load();
         }
     }
 
     [ObjectSystem]
     public class AIDispatcherComponentLoadSystem: LoadSystem<AIDispatcherComponent>
     {
-        public override void Load(AIDispatcherComponent self)
+        public override void Load(AIDispatcherComponent me)
         {
-            self.Load();
+            me.Load();
         }
     }
 
     [ObjectSystem]
     public class AIDispatcherComponentDestroySystem: DestroySystem<AIDispatcherComponent>
     {
-        public override void Destroy(AIDispatcherComponent self)
+        public override void Destroy(AIDispatcherComponent me)
         {
-            self.AIHandlers.Clear();
+            me.AIHandlers.Clear();
             AIDispatcherComponent.Instance = null;
         }
     }
@@ -36,9 +36,9 @@ namespace ET
     [FriendClass(typeof(AIDispatcherComponent))]
     public static class AIDispatcherComponentSystem
     {
-        public static void Load(this AIDispatcherComponent self)
+        public static void Load(this AIDispatcherComponent me)
         {
-            self.AIHandlers.Clear();
+            me.AIHandlers.Clear();
             
             var types = Game.EventSystem.GetTypes(typeof (AIHandlerAttribute));
             foreach (Type type in types)
@@ -49,7 +49,7 @@ namespace ET
                     Log.Error($"robot ai is not AAIHandler: {type.Name}");
                     continue;
                 }
-                self.AIHandlers.Add(type.Name, aaiHandler);
+                me.AIHandlers.Add(type.Name, aaiHandler);
             }
         }
     }

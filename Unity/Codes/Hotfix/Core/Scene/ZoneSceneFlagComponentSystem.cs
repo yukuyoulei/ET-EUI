@@ -3,18 +3,18 @@
     [ObjectSystem]
     public class ZoneSceneFlagComponentDestroySystem: DestroySystem<ZoneSceneFlagComponent>
     {
-        public override void Destroy(ZoneSceneFlagComponent self)
+        public override void Destroy(ZoneSceneFlagComponent me)
         {
-            ZoneSceneManagerComponent.Instance.Remove(self.DomainZone());
+            ZoneSceneManagerComponent.Instance.Remove(me.DomainZone());
         }
     }
 
     [ObjectSystem]
     public class ZoneSceneFlagComponentAwakeSystem: AwakeSystem<ZoneSceneFlagComponent>
     {
-        public override void Awake(ZoneSceneFlagComponent self)
+        public override void Awake(ZoneSceneFlagComponent me)
         {
-            ZoneSceneManagerComponent.Instance.Add(self.GetParent<Scene>());
+            ZoneSceneManagerComponent.Instance.Add(me.GetParent<Scene>());
         }
     }
 }

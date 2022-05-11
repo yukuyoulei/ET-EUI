@@ -154,7 +154,7 @@ namespace ET
                 
                 if (value == this)
                 {
-                    throw new Exception($"cant set parent self: {this.GetType().Name}");
+                    throw new Exception($"cant set parent me: {this.GetType().Name}");
                 }
 
                 // 严格限制parent必须要有domain,也就是说parent必须在数据树上面
@@ -195,7 +195,7 @@ namespace ET
                 
                 if (value == this)
                 {
-                    throw new Exception($"cant set parent self: {this.GetType().Name}");
+                    throw new Exception($"cant set parent me: {this.GetType().Name}");
                 }
                 
                 // 严格限制parent必须要有domain,也就是说parent必须在数据树上面

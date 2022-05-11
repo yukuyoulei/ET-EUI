@@ -3,9 +3,9 @@
     public static class ESCommonUISystem
     {
 
-        public static void SetLabelContent(this ESCommonUI self, string message)
+        public static void SetLabelContent(this ESCommonUI me, string message)
         {
-            self.ELabel_Test2Text.text = message;
+            me.ELabel_Test2Text.text = message;
         }
         
         

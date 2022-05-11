@@ -23,60 +23,60 @@ namespace ILRuntime.Mono.Cecil {
 
 	static partial class Mixin {
 
-		public static bool GetAttributes (this uint self, uint attributes)
+		public static bool GetAttributes (this uint me, uint attributes)
 		{
-			return (self & attributes) != 0;
+			return (me & attributes) != 0;
 		}
 
-		public static uint SetAttributes (this uint self, uint attributes, bool value)
+		public static uint SetAttributes (this uint me, uint attributes, bool value)
 		{
 			if (value)
-				return self | attributes;
+				return me | attributes;
 
-			return self & ~attributes;
+			return me & ~attributes;
 		}
 
-		public static bool GetMaskedAttributes (this uint self, uint mask, uint attributes)
+		public static bool GetMaskedAttributes (this uint me, uint mask, uint attributes)
 		{
-			return (self & mask) == attributes;
+			return (me & mask) == attributes;
 		}
 
-		public static uint SetMaskedAttributes (this uint self, uint mask, uint attributes, bool value)
+		public static uint SetMaskedAttributes (this uint me, uint mask, uint attributes, bool value)
 		{
 			if (value) {
-				self &= ~mask;
-				return self | attributes;
+				me &= ~mask;
+				return me | attributes;
 			}
 
-			return self & ~(mask & attributes);
+			return me & ~(mask & attributes);
 		}
 
-		public static bool GetAttributes (this ushort self, ushort attributes)
+		public static bool GetAttributes (this ushort me, ushort attributes)
 		{
-			return (self & attributes) != 0;
+			return (me & attributes) != 0;
 		}
 
-		public static ushort SetAttributes (this ushort self, ushort attributes, bool value)
+		public static ushort SetAttributes (this ushort me, ushort attributes, bool value)
 		{
 			if (value)
-				return (ushort) (self | attributes);
+				return (ushort) (me | attributes);
 
-			return (ushort) (self & ~attributes);
+			return (ushort) (me & ~attributes);
 		}
 
-		public static bool GetMaskedAttributes (this ushort self, ushort mask, uint attributes)
+		public static bool GetMaskedAttributes (this ushort me, ushort mask, uint attributes)
 		{
-			return (self & mask) == attributes;
+			return (me & mask) == attributes;
 		}
 
-		public static ushort SetMaskedAttributes (this ushort self, ushort mask, uint attributes, bool value)
+		public static ushort SetMaskedAttributes (this ushort me, ushort mask, uint attributes, bool value)
 		{
 			if (value) {
-				self = (ushort) (self & ~mask);
-				return (ushort) (self | attributes);
+				me = (ushort) (me & ~mask);
+				return (ushort) (me | attributes);
 			}
 
-			return (ushort) (self & ~(mask & attributes));
+			return (ushort) (me & ~(mask & attributes));
 		}
 	}
 }

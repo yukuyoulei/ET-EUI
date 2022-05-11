@@ -28,17 +28,17 @@ namespace ILRuntime.Mono.Cecil {
 
 	static partial class Mixin {
 
-		public static bool HasImplicitThis (this IMethodSignature self)
+		public static bool HasImplicitThis (this IMethodSignature me)
 		{
-			return self.HasThis && !self.ExplicitThis;
+			return me.HasThis && !me.ExplicitThis;
 		}
 
-		public static void MethodSignatureFullName (this IMethodSignature self, StringBuilder builder)
+		public static void MethodSignatureFullName (this IMethodSignature me, StringBuilder builder)
 		{
 			builder.Append ("(");
 
-			if (self.HasParameters) {
-				var parameters = self.Parameters;
+			if (me.HasParameters) {
+				var parameters = me.Parameters;
 				for (int i = 0; i < parameters.Count; i++) {
 					var parameter = parameters [i];
 					if (i > 0)

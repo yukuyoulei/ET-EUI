@@ -24,19 +24,19 @@ namespace ILRuntime.Mono.Cecil {
 	static partial class Mixin {
 
 		public static bool GetHasCustomAttributes (
-			this ICustomAttributeProvider self,
+			this ICustomAttributeProvider me,
 			ModuleDefinition module)
 		{
-			return module.HasImage () && module.Read (self, (provider, reader) => reader.HasCustomAttributes (provider));
+			return module.HasImage () && module.Read (me, (provider, reader) => reader.HasCustomAttributes (provider));
 		}
 
 		public static Collection<CustomAttribute> GetCustomAttributes (
-			this ICustomAttributeProvider self,
+			this ICustomAttributeProvider me,
 			ref Collection<CustomAttribute> variable,
 			ModuleDefinition module)
 		{
 			if (module.HasImage ())
-				return module.Read (ref variable, self, (provider, reader) => reader.ReadCustomAttributes (provider));
+				return module.Read (ref variable, me, (provider, reader) => reader.ReadCustomAttributes (provider));
 
 			Interlocked.CompareExchange (ref variable, new Collection<CustomAttribute> (), null);
 			return variable;

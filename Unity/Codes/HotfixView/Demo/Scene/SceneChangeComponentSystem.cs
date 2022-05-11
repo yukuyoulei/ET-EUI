@@ -4,20 +4,20 @@ namespace ET
 {
     public class SceneChangeComponentUpdateSystem: UpdateSystem<SceneChangeComponent>
     {
-        public override void Update(SceneChangeComponent self)
+        public override void Update(SceneChangeComponent me)
         {
-            if (!self.loadMapOperation.isDone)
+            if (!me.loadMapOperation.isDone)
             {
                 return;
             }
 
-            if (self.tcs == null)
+            if (me.tcs == null)
             {
                 return;
             }
             
-            ETTask tcs = self.tcs;
-            self.tcs = null;
+            ETTask tcs = me.tcs;
+            me.tcs = null;
             tcs.SetResult();
         }
     }
@@ -25,32 +25,32 @@ namespace ET
     
     public class SceneChangeComponentDestroySystem: DestroySystem<SceneChangeComponent>
     {
-        public override void Destroy(SceneChangeComponent self)
+        public override void Destroy(SceneChangeComponent me)
         {
-            self.loadMapOperation = null;
-            self.tcs = null;
+            me.loadMapOperation = null;
+            me.tcs = null;
         }
     }
 
     [FriendClass(typeof(SceneChangeComponent))]
     public static class SceneChangeComponentSystem
     {
-        public static async ETTask ChangeSceneAsync(this SceneChangeComponent self, string sceneName)
+        public static async ETTask ChangeSceneAsync(this SceneChangeComponent me, string sceneName)
         {
-            self.tcs = ETTask.Create(true);
+            me.tcs = ETTask.Create(true);
             // 加载map
-            self.loadMapOperation = SceneManager.LoadSceneAsync(sceneName);
+            me.loadMapOperation = SceneManager.LoadSceneAsync(sceneName);
             //this.loadMapOperation.allowSceneActivation = false;
-            await self.tcs;
+            await me.tcs;
         }
         
-        public static int Process(this SceneChangeComponent self)
+        public static int Process(this SceneChangeComponent me)
         {
-            if (self.loadMapOperation == null)
+            if (me.loadMapOperation == null)
             {
                 return 0;
             }
-            return (int)(self.loadMapOperation.progress * 100);
+            return (int)(me.loadMapOperation.progress * 100);
         }
     }
 }

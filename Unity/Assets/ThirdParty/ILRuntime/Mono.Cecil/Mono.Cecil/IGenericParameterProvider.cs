@@ -38,21 +38,21 @@ namespace ILRuntime.Mono.Cecil {
 	static partial class Mixin {
 
 		public static bool GetHasGenericParameters (
-			this IGenericParameterProvider self,
+			this IGenericParameterProvider me,
 			ModuleDefinition module)
 		{
-			return module.HasImage () && module.Read (self, (provider, reader) => reader.HasGenericParameters (provider));
+			return module.HasImage () && module.Read (me, (provider, reader) => reader.HasGenericParameters (provider));
 		}
 
 		public static Collection<GenericParameter> GetGenericParameters (
-			this IGenericParameterProvider self,
+			this IGenericParameterProvider me,
 			ref Collection<GenericParameter> collection,
 			ModuleDefinition module)
 		{
 			if (module.HasImage ())
-				return module.Read (ref collection, self, (provider, reader) => reader.ReadGenericParameters (provider));
+				return module.Read (ref collection, me, (provider, reader) => reader.ReadGenericParameters (provider));
 
-			Interlocked.CompareExchange (ref collection, new GenericParameterCollection (self), null);
+			Interlocked.CompareExchange (ref collection, new GenericParameterCollection (me), null);
 			return collection;
 		}
 	}

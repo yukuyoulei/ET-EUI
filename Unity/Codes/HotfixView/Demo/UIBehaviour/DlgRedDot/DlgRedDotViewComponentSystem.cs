@@ -6,9 +6,9 @@ namespace ET
 	[ObjectSystem]
 	public class DlgRedDotViewComponentAwakeSystem : AwakeSystem<DlgRedDotViewComponent> 
 	{
-		public override void Awake(DlgRedDotViewComponent self)
+		public override void Awake(DlgRedDotViewComponent me)
 		{
-			self.uiTransform = self.GetParent<UIBaseWindow>().uiTransform;
+			me.uiTransform = me.GetParent<UIBaseWindow>().uiTransform;
 		}
 	}
 
@@ -16,9 +16,9 @@ namespace ET
 	[ObjectSystem]
 	public class DlgRedDotViewComponentDestroySystem : DestroySystem<DlgRedDotViewComponent> 
 	{
-		public override void Destroy(DlgRedDotViewComponent self)
+		public override void Destroy(DlgRedDotViewComponent me)
 		{
-			self.DestroyWidget();
+			me.DestroyWidget();
 		}
 	}
 }

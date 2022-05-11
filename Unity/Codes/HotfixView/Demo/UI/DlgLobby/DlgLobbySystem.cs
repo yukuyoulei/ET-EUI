@@ -9,23 +9,23 @@ namespace ET
 	public static  class DlgLobbySystem
 	{
 
-		public static void RegisterUIEvent(this DlgLobby self)
+		public static void RegisterUIEvent(this DlgLobby me)
 		{
-		  self.View.E_EnterMapButton.AddListener(()=>
+		  me.View.E_EnterMapButton.AddListener(async ()=>
 		  {
-			  self.OnEnterMapClickHandler().Coroutine();
+			  await me.OnEnterMapClickHandler();
 		  });
 		
 		}
 
-		public static void ShowWindow(this DlgLobby self, Entity contextData = null)
+		public static void ShowWindow(this DlgLobby me, Entity contextData = null)
 		{
 
 		}
 		
-		public static async ETTask OnEnterMapClickHandler(this DlgLobby self)
+		public static async ETTask OnEnterMapClickHandler(this DlgLobby me)
 		{
-			await EnterMapHelper.EnterMapAsync(self.ZoneScene());
+			await EnterMapHelper.EnterMapAsync(me.ZoneScene());
 		}
 	}
 }

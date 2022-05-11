@@ -24,47 +24,47 @@ namespace ET
         [ObjectSystem]
         public class SessionAwakeSystem: AwakeSystem<Session, AService>
         {
-            public override void Awake(Session self, AService aService)
+            public override void Awake(Session me, AService aService)
             {
-                self.AService = aService;
+                me.AService = aService;
                 long timeNow = TimeHelper.ClientNow();
-                self.LastRecvTime = timeNow;
-                self.LastSendTime = timeNow;
+                me.LastRecvTime = timeNow;
+                me.LastSendTime = timeNow;
 
-                self.requestCallbacks.Clear();
+                me.requestCallbacks.Clear();
             
-                Log.Info($"session create: zone: {self.DomainZone()} id: {self.Id} {timeNow} ");
+                Log.Info($"session create: zone: {me.DomainZone()} id: {me.Id} {timeNow} ");
             }
         }
         
         [ObjectSystem]
         public class SessionDestroySystem: DestroySystem<Session>
         {
-            public override void Destroy(Session self)
+            public override void Destroy(Session me)
             {
-                self.AService.RemoveChannel(self.Id);
+                me.AService.RemoveChannel(me.Id);
             
-                foreach (RpcInfo responseCallback in self.requestCallbacks.Values.ToArray())
+                foreach (RpcInfo responseCallback in me.requestCallbacks.Values.ToArray())
                 {
-                    responseCallback.Tcs.SetException(new RpcException(self.Error, $"session dispose: {self.Id} {self.RemoteAddress}"));
+                    responseCallback.Tcs.SetException(new RpcException(me.Error, $"session dispose: {me.Id} {me.RemoteAddress}"));
                 }
 
-                Log.Info($"session dispose: {self.RemoteAddress} id: {self.Id} ErrorCode: {self.Error}, please see ErrorCode.cs! {TimeHelper.ClientNow()}");
+                Log.Info($"session dispose: {me.RemoteAddress} id: {me.Id} ErrorCode: {me.Error}, please see ErrorCode.cs! {TimeHelper.ClientNow()}");
             
-                self.requestCallbacks.Clear();
+                me.requestCallbacks.Clear();
             }
         }
         
-        public static void OnRead(this Session self, ushort opcode, IResponse response)
+        public static void OnRead(this Session me, ushort opcode, IResponse response)
         {
-            OpcodeHelper.LogMsg(self.DomainZone(), opcode, response);
+            OpcodeHelper.LogMsg(me.DomainZone(), opcode, response);
             
-            if (!self.requestCallbacks.TryGetValue(response.RpcId, out var action))
+            if (!me.requestCallbacks.TryGetValue(response.RpcId, out var action))
             {
                 return;
             }
 
-            self.requestCallbacks.Remove(response.RpcId);
+            me.requestCallbacks.Remove(response.RpcId);
             if (ErrorCore.IsRpcNeedThrowException(response.Error))
             {
                 action.Tcs.SetException(new Exception($"Rpc error, request: {action.Request} response: {response}"));
@@ -73,23 +73,23 @@ namespace ET
             action.Tcs.SetResult(response);
         }
         
-        public static async ETTask<IResponse> Call(this Session self, IRequest request, ETCancellationToken cancellationToken)
+        public static async ETTask<IResponse> Call(this Session me, IRequest request, ETCancellationToken cancellationToken)
         {
             int rpcId = ++Session.RpcId;
             RpcInfo rpcInfo = new RpcInfo(request);
-            self.requestCallbacks[rpcId] = rpcInfo;
+            me.requestCallbacks[rpcId] = rpcInfo;
             request.RpcId = rpcId;
 
-            self.Send(request);
+            me.Send(request);
             
             void CancelAction()
             {
-                if (!self.requestCallbacks.TryGetValue(rpcId, out RpcInfo action))
+                if (!me.requestCallbacks.TryGetValue(rpcId, out RpcInfo action))
                 {
                     return;
                 }
 
-                self.requestCallbacks.Remove(rpcId);
+                me.requestCallbacks.Remove(rpcId);
                 Type responseType = OpcodeTypeComponent.Instance.GetResponseType(action.Request.GetType());
                 IResponse response = (IResponse) Activator.CreateInstance(responseType);
                 response.Error = ErrorCore.ERR_Cancel;
@@ -109,37 +109,37 @@ namespace ET
             return ret;
         }
 
-        public static async ETTask<IResponse> Call(this Session self, IRequest request)
+        public static async ETTask<IResponse> Call(this Session me, IRequest request)
         {
             int rpcId = ++Session.RpcId;
             RpcInfo rpcInfo = new RpcInfo(request);
-            self.requestCallbacks[rpcId] = rpcInfo;
+            me.requestCallbacks[rpcId] = rpcInfo;
             request.RpcId = rpcId;
-            self.Send(request);
+            me.Send(request);
             return await rpcInfo.Tcs;
         }
 
-        public static void Reply(this Session self, IResponse message)
+        public static void Reply(this Session me, IResponse message)
         {
-            self.Send(0, message);
+            me.Send(0, message);
         }
 
-        public static void Send(this Session self, IMessage message)
+        public static void Send(this Session me, IMessage message)
         {
-            self.Send(0, message);
+            me.Send(0, message);
         }
         
-        public static void Send(this Session self, long actorId, IMessage message)
+        public static void Send(this Session me, long actorId, IMessage message)
         {
             (ushort opcode, MemoryStream stream) = MessageSerializeHelper.MessageToStream(message);
-            OpcodeHelper.LogMsg(self.DomainZone(), opcode, message);
-            self.Send(actorId, stream);
+            OpcodeHelper.LogMsg(me.DomainZone(), opcode, message);
+            me.Send(actorId, stream);
         }
         
-        public static void Send(this Session self, long actorId, MemoryStream memoryStream)
+        public static void Send(this Session me, long actorId, MemoryStream memoryStream)
         {
-            self.LastSendTime = TimeHelper.ClientNow();
-            self.AService.SendStream(self.Id, actorId, memoryStream);
+            me.LastSendTime = TimeHelper.ClientNow();
+            me.AService.SendStream(me.Id, actorId, memoryStream);
         }
     }
 

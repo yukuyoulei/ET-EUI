@@ -5,31 +5,31 @@ namespace ET
     [ObjectSystem]
     public class CoroutineLockAwakeSystem: AwakeSystem<CoroutineLock, int, long, int>
     {
-        public override void Awake(CoroutineLock self, int type, long k, int count)
+        public override void Awake(CoroutineLock me, int type, long k, int count)
         {
-            self.coroutineLockType = type;
-            self.key = k;
-            self.level = count;
+            me.coroutineLockType = type;
+            me.key = k;
+            me.level = count;
         }
     }
 
     [ObjectSystem]
     public class CoroutineLockDestroySystem: DestroySystem<CoroutineLock>
     {
-        public override void Destroy(CoroutineLock self)
+        public override void Destroy(CoroutineLock me)
         {
-            if (self.coroutineLockType != CoroutineLockType.None)
+            if (me.coroutineLockType != CoroutineLockType.None)
             {
-                CoroutineLockComponent.Instance.RunNextCoroutine(self.coroutineLockType, self.key, self.level + 1);
+                CoroutineLockComponent.Instance.RunNextCoroutine(me.coroutineLockType, me.key, me.level + 1);
             }
             else
             {
                 // CoroutineLockType.None说明协程锁超时了
-                Log.Error($"coroutine lock timeout: {self.coroutineLockType} {self.key} {self.level}");
+                Log.Error($"coroutine lock timeout: {me.coroutineLockType} {me.key} {me.level}");
             }
-            self.coroutineLockType = CoroutineLockType.None;
-            self.key = 0;
-            self.level = 0;
+            me.coroutineLockType = CoroutineLockType.None;
+            me.key = 0;
+            me.level = 0;
         }
     }
     

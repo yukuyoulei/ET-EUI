@@ -38,6 +38,16 @@ namespace ET
             ThreadSynchronizationContext.Update();
             TimeInfo.Update();
             EventSystem.Update();
+            
+            // KeyCode.R
+            if (InputHelper.GetKeyDown(114))
+            {
+                CodeLoader.Instance.CodeMode = CodeMode.Reload;
+                CodeLoader.Instance.LoadLogic();
+                Game.EventSystem.Add(CodeLoader.Instance.GetHotfixTypes());
+                Game.EventSystem.Load();
+                Log.Debug("hot reload success!");
+            }
         }
         
         public static void LateUpdate()

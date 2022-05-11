@@ -2,9 +2,9 @@
 {
 	public class SessionComponentDestroySystem: DestroySystem<SessionComponent>
 	{
-		public override void Destroy(SessionComponent self)
+		public override void Destroy(SessionComponent me)
 		{
-			self.Session.Dispose();
+			me.Session.Dispose();
 		}
 	}
 }

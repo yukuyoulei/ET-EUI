@@ -5,15 +5,15 @@ namespace ET
     [Timer(TimerType.SessionAcceptTimeout)]
     public class SessionAcceptTimeout: ATimer<SessionAcceptTimeoutComponent>
     {
-        public override void Run(SessionAcceptTimeoutComponent self)
+        public override void Run(SessionAcceptTimeoutComponent me)
         {
             try
             {
-                self.Parent.Dispose();
+                me.Parent.Dispose();
             }
             catch (Exception e)
             {
-                Log.Error($"move timer error: {self.Id}\n{e}");
+                Log.Error($"move timer error: {me.Id}\n{e}");
             }
         }
     }
@@ -21,18 +21,18 @@ namespace ET
     [ObjectSystem]
     public class SessionAcceptTimeoutComponentAwakeSystem: AwakeSystem<SessionAcceptTimeoutComponent>
     {
-        public override void Awake(SessionAcceptTimeoutComponent self)
+        public override void Awake(SessionAcceptTimeoutComponent me)
         {
-            self.Timer = TimerComponent.Instance.NewOnceTimer(TimeHelper.ServerNow() + 5000, TimerType.SessionAcceptTimeout, self);
+            me.Timer = TimerComponent.Instance.NewOnceTimer(TimeHelper.ServerNow() + 5000, TimerType.SessionAcceptTimeout, me);
         }
     }
 
     [ObjectSystem]
     public class SessionAcceptTimeoutComponentDestroySystem: DestroySystem<SessionAcceptTimeoutComponent>
     {
-        public override void Destroy(SessionAcceptTimeoutComponent self)
+        public override void Destroy(SessionAcceptTimeoutComponent me)
         {
-            TimerComponent.Instance.Remove(ref self.Timer);
+            TimerComponent.Instance.Remove(ref me.Timer);
         }
     }
 }

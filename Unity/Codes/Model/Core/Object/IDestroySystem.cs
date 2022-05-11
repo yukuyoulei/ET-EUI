@@ -30,6 +30,6 @@ namespace ET
 			return typeof(T);
 		}
 
-		public abstract void Destroy(T self);
+		public abstract void Destroy(T me);
 	}
 }

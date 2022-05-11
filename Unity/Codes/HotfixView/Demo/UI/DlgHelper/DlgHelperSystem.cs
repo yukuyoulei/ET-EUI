@@ -9,12 +9,12 @@ namespace ET
 	public static  class DlgHelperSystem
 	{
 
-		public static void RegisterUIEvent(this DlgHelper self)
+		public static void RegisterUIEvent(this DlgHelper me)
 		{
 		 
 		}
 
-		public static void ShowWindow(this DlgHelper self, Entity contextData = null)
+		public static void ShowWindow(this DlgHelper me, Entity contextData = null)
 		{
 		}
 

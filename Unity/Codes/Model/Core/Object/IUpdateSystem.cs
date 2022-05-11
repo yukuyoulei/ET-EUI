@@ -29,6 +29,6 @@ namespace ET
 			return typeof(IUpdateSystem);
 		}
 
-		public abstract void Update(T self);
+		public abstract void Update(T me);
 	}
 }

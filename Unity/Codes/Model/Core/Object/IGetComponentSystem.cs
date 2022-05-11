@@ -33,6 +33,6 @@ namespace ET
 			return typeof(T);
 		}
 
-		public abstract void GetComponent(T self, Entity component);
+		public abstract void GetComponent(T me, Entity component);
 	}
 }

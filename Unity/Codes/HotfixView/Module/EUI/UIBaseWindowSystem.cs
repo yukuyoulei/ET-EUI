@@ -6,28 +6,28 @@ namespace ET
     [ObjectSystem]
     public class UIBaseWindowAwakeSystem : AwakeSystem<UIBaseWindow>
     {
-        public override void Awake(UIBaseWindow self)
+        public override void Awake(UIBaseWindow me)
         {
-            self.WindowData = self.AddChild<WindowCoreData>();
+            me.WindowData = me.AddChild<WindowCoreData>();
         }
     }
     
     public  static class UIBaseWindowSystem  
     {
-        public static void SetRoot(this UIBaseWindow self, Transform rootTransform)
+        public static void SetRoot(this UIBaseWindow me, Transform rootTransform)
         {
-            if(self.uiTransform == null)
+            if(me.uiTransform == null)
             {
-                Log.Error($"uibaseWindows {self.WindowID} uiTransform is null!!!");
+                Log.Error($"uibaseWindows {me.WindowID} uiTransform is null!!!");
                 return;
             }
             if(rootTransform == null)
             {
-                Log.Error($"uibaseWindows {self.WindowID} rootTransform is null!!!");
+                Log.Error($"uibaseWindows {me.WindowID} rootTransform is null!!!");
                 return;
             }
-            self.uiTransform.SetParent(rootTransform, false);
-            self.uiTransform.transform.localScale = Vector3.one;
+            me.uiTransform.SetParent(rootTransform, false);
+            me.uiTransform.transform.localScale = Vector3.one;
         }
     }
 }

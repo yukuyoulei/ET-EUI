@@ -8,14 +8,14 @@ namespace ET
         [ObjectSystem]
             public class ResourcesLoaderComponentDestroySystem: DestroySystem<ResourcesLoaderComponent>
             {
-                public override void Destroy(ResourcesLoaderComponent self)
+                public override void Destroy(ResourcesLoaderComponent me)
                 {
                     async ETTask UnLoadAsync()
                     {
                         using (ListComponent<string> list = ListComponent<string>.Create())
                         {
-                            list.AddRange(self.LoadedResource);
-                            self.LoadedResource = null;
+                            list.AddRange(me.LoadedResource);
+                            me.LoadedResource = null;
         
                             if (TimerComponent.Instance == null)
                             {
@@ -53,24 +53,24 @@ namespace ET
                 }
             }
         
-        public static async ETTask LoadAsync(this ResourcesLoaderComponent self, string ab)
+        public static async ETTask LoadAsync(this ResourcesLoaderComponent me, string ab)
         {
             CoroutineLock coroutineLock = null;
             try
             {
                 coroutineLock = await CoroutineLockComponent.Instance.Wait(CoroutineLockType.ResourcesLoader, ab.GetHashCode(), 0);
-                if (self.IsDisposed)
+                if (me.IsDisposed)
                 {
                     Log.Error($"resourceload already disposed {ab}");
                     return;
                 }
 
-                if (self.LoadedResource.Contains(ab))
+                if (me.LoadedResource.Contains(ab))
                 {
                     return;
                 }
 
-                self.LoadedResource.Add(ab);
+                me.LoadedResource.Add(ab);
                 await ResourcesComponent.Instance.LoadBundleAsync(ab);
             }
             finally

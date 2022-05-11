@@ -7,9 +7,9 @@ namespace ET
         [ObjectSystem]
         public class DestroySystem: DestroySystem<GameObjectComponent>
         {
-            public override void Destroy(GameObjectComponent self)
+            public override void Destroy(GameObjectComponent me)
             {
-                UnityEngine.Object.Destroy(self.GameObject);
+                UnityEngine.Object.Destroy(me.GameObject);
             }
         }
     }

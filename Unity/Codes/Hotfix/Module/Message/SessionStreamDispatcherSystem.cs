@@ -7,26 +7,26 @@ namespace ET
     [ObjectSystem]
     public class SessionStreamDispatcherAwakeSystem: AwakeSystem<SessionStreamDispatcher>
     {
-        public override void Awake(SessionStreamDispatcher self)
+        public override void Awake(SessionStreamDispatcher me)
         {
-            SessionStreamDispatcher.Instance = self;
-            self.Load();
+            SessionStreamDispatcher.Instance = me;
+            me.Load();
         }
     }
 
     [ObjectSystem]
     public class SessionStreamDispatcherLoadSystem: LoadSystem<SessionStreamDispatcher>
     {
-        public override void Load(SessionStreamDispatcher self)
+        public override void Load(SessionStreamDispatcher me)
         {
-            self.Load();
+            me.Load();
         }
     }
 
     [ObjectSystem]
     public class SessionStreamDispatcherDestroySystem: DestroySystem<SessionStreamDispatcher>
     {
-        public override void Destroy(SessionStreamDispatcher self)
+        public override void Destroy(SessionStreamDispatcher me)
         {
             SessionStreamDispatcher.Instance = null;
         }
@@ -35,9 +35,9 @@ namespace ET
     [FriendClass(typeof(SessionStreamDispatcher))]
     public static class SessionStreamDispatcherSystem
     {
-        public static void Load(this SessionStreamDispatcher self)
+        public static void Load(this SessionStreamDispatcher me)
         {
-            self.Dispatchers = new ISessionStreamDispatcher[100];
+            me.Dispatchers = new ISessionStreamDispatcher[100];
             
             List<Type> types = Game.EventSystem.GetTypes(typeof (SessionStreamDispatcherAttribute));
 
@@ -68,13 +68,13 @@ namespace ET
                     continue;
                 }
 
-                self.Dispatchers[sessionStreamDispatcherAttribute.Type] = iSessionStreamDispatcher;
+                me.Dispatchers[sessionStreamDispatcherAttribute.Type] = iSessionStreamDispatcher;
             }
         }
 
-        public static void Dispatch(this SessionStreamDispatcher self, int type, Session session, MemoryStream memoryStream)
+        public static void Dispatch(this SessionStreamDispatcher me, int type, Session session, MemoryStream memoryStream)
         {
-            ISessionStreamDispatcher sessionStreamDispatcher = self.Dispatchers[type];
+            ISessionStreamDispatcher sessionStreamDispatcher = me.Dispatchers[type];
             if (sessionStreamDispatcher == null)
             {
                 throw new Exception("maybe your NetInnerComponent or NetOuterComponent not set SessionStreamDispatcherType");

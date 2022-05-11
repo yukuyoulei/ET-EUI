@@ -54,20 +54,20 @@ namespace ET
         }
         
 #if !NOT_UNITY
-        private static async Task WaitForExitAsync(this Process self)
+        private static async Task WaitForExitAsync(this Process me)
         {
-            if (!self.HasExited)
+            if (!me.HasExited)
             {
                 return;
             }
 
             try
             {
-                self.EnableRaisingEvents = true;
+                me.EnableRaisingEvents = true;
             }
             catch (InvalidOperationException)
             {
-                if (self.HasExited)
+                if (me.HasExited)
                 {
                     return;
                 }
@@ -78,11 +78,11 @@ namespace ET
 
             void Handler(object s, EventArgs e) => tcs.TrySetResult(true);
             
-            self.Exited += Handler;
+            me.Exited += Handler;
 
             try
             {
-                if (self.HasExited)
+                if (me.HasExited)
                 {
                     return;
                 }
@@ -90,7 +90,7 @@ namespace ET
             }
             finally
             {
-                self.Exited -= Handler;
+                me.Exited -= Handler;
             }
         }
 #endif

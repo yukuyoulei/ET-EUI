@@ -515,13 +515,13 @@ namespace ILRuntime.Mono.Cecil {
 
 	static partial class Mixin {
 
-		public static ParameterDefinition GetParameter (this MethodBody self, int index)
+		public static ParameterDefinition GetParameter (this MethodBody me, int index)
 		{
-			var method = self.method;
+			var method = me.method;
 
 			if (method.HasThis) {
 				if (index == 0)
-					return self.ThisParameter;
+					return me.ThisParameter;
 
 				index--;
 			}
@@ -534,9 +534,9 @@ namespace ILRuntime.Mono.Cecil {
 			return parameters [index];
 		}
 
-		public static VariableDefinition GetVariable (this MethodBody self, int index)
+		public static VariableDefinition GetVariable (this MethodBody me, int index)
 		{
-			var variables = self.Variables;
+			var variables = me.Variables;
 
 			if (index < 0 || index >= variables.size)
 				return null;
@@ -544,17 +544,17 @@ namespace ILRuntime.Mono.Cecil {
 			return variables [index];
 		}
 
-		public static bool GetSemantics (this MethodDefinition self, MethodSemanticsAttributes semantics)
+		public static bool GetSemantics (this MethodDefinition me, MethodSemanticsAttributes semantics)
 		{
-			return (self.SemanticsAttributes & semantics) != 0;
+			return (me.SemanticsAttributes & semantics) != 0;
 		}
 
-		public static void SetSemantics (this MethodDefinition self, MethodSemanticsAttributes semantics, bool value)
+		public static void SetSemantics (this MethodDefinition me, MethodSemanticsAttributes semantics, bool value)
 		{
 			if (value)
-				self.SemanticsAttributes |= semantics;
+				me.SemanticsAttributes |= semantics;
 			else
-				self.SemanticsAttributes &= ~semantics;
+				me.SemanticsAttributes &= ~semantics;
 		}
 	}
 }

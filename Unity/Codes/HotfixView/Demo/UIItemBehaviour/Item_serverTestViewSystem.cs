@@ -6,9 +6,9 @@ namespace ET
 	[ObjectSystem]
 	public class Scroll_Item_serverTestDestroySystem : DestroySystem<Scroll_Item_serverTest> 
 	{
-		public override void Destroy( Scroll_Item_serverTest self )
+		public override void Destroy( Scroll_Item_serverTest me )
 		{
-			self.DestroyWidget();
+			me.DestroyWidget();
 		}
 	}
 }

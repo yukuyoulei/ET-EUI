@@ -8,43 +8,43 @@ namespace ET
         [ObjectSystem]
         public class CoroutineLockQueueTypeAwakeSystem: AwakeSystem<CoroutineLockQueueType>
         {
-            public override void Awake(CoroutineLockQueueType self)
+            public override void Awake(CoroutineLockQueueType me)
             {
-                if (self.dictionary == null)
+                if (me.dictionary == null)
                 {
-                    self.dictionary = new Dictionary<long, CoroutineLockQueue>();
+                    me.dictionary = new Dictionary<long, CoroutineLockQueue>();
                 }
 
-                self.dictionary.Clear();
+                me.dictionary.Clear();
             }
         }
 
         [ObjectSystem]
         public class CoroutineLockQueueTypeDestroySystem: DestroySystem<CoroutineLockQueueType>
         {
-            public override void Destroy(CoroutineLockQueueType self)
+            public override void Destroy(CoroutineLockQueueType me)
             {
-                self.dictionary.Clear();
+                me.dictionary.Clear();
             }
         }
         
-        public static bool TryGetValue(this CoroutineLockQueueType self, long key, out CoroutineLockQueue value)
+        public static bool TryGetValue(this CoroutineLockQueueType me, long key, out CoroutineLockQueue value)
         {
-            return self.dictionary.TryGetValue(key, out value);
+            return me.dictionary.TryGetValue(key, out value);
         }
 
-        public static void Remove(this CoroutineLockQueueType self, long key)
+        public static void Remove(this CoroutineLockQueueType me, long key)
         {
-            if (self.dictionary.TryGetValue(key, out CoroutineLockQueue value))
+            if (me.dictionary.TryGetValue(key, out CoroutineLockQueue value))
             {
                 value.Dispose();
             }
-            self.dictionary.Remove(key);
+            me.dictionary.Remove(key);
         }
         
-        public static void Add(this CoroutineLockQueueType self, long key, CoroutineLockQueue value)
+        public static void Add(this CoroutineLockQueueType me, long key, CoroutineLockQueue value)
         {
-            self.dictionary.Add(key, value);
+            me.dictionary.Add(key, value);
         }
     }
     

@@ -9,26 +9,26 @@ namespace ET
         [ObjectSystem]
         public class CoroutineLockComponentAwakeSystem: AwakeSystem<CoroutineLockComponent>
         {
-            public override void Awake(CoroutineLockComponent self)
+            public override void Awake(CoroutineLockComponent me)
             {
-                CoroutineLockComponent.Instance = self;
+                CoroutineLockComponent.Instance = me;
 
-                self.list = new List<CoroutineLockQueueType>(CoroutineLockType.Max);
+                me.list = new List<CoroutineLockQueueType>(CoroutineLockType.Max);
                 for (int i = 0; i < CoroutineLockType.Max; ++i)
                 {
-                    CoroutineLockQueueType coroutineLockQueueType = self.AddChildWithId<CoroutineLockQueueType>(++self.idGenerator);
-                    self.list.Add(coroutineLockQueueType);
+                    CoroutineLockQueueType coroutineLockQueueType = me.AddChildWithId<CoroutineLockQueueType>(++me.idGenerator);
+                    me.list.Add(coroutineLockQueueType);
                 }
 
-                self.foreachFunc = (k, v) =>
+                me.foreachFunc = (k, v) =>
                 {
-                    if (k > self.timeNow)
+                    if (k > me.timeNow)
                     {
-                        self.minTime = k;
+                        me.minTime = k;
                         return false;
                     }
 
-                    self.timeOutIds.Enqueue(k);
+                    me.timeOutIds.Enqueue(k);
                     return true;
                 };
             }
@@ -37,69 +37,69 @@ namespace ET
         [ObjectSystem]
         public class CoroutineLockComponentDestroySystem: DestroySystem<CoroutineLockComponent>
         {
-            public override void Destroy(CoroutineLockComponent self)
+            public override void Destroy(CoroutineLockComponent me)
             {
-                self.list.Clear();
-                self.nextFrameRun.Clear();
-                self.timers.Clear();
-                self.timeOutIds.Clear();
-                self.timerOutTimer.Clear();
-                self.idGenerator = 0;
-                self.minTime = 0;
+                me.list.Clear();
+                me.nextFrameRun.Clear();
+                me.timers.Clear();
+                me.timeOutIds.Clear();
+                me.timerOutTimer.Clear();
+                me.idGenerator = 0;
+                me.minTime = 0;
             }
         }
 
         [FriendClass(typeof (CoroutineLock))]
         public class CoroutineLockComponentUpdateSystem: UpdateSystem<CoroutineLockComponent>
         {
-            public override void Update(CoroutineLockComponent self)
+            public override void Update(CoroutineLockComponent me)
             {
                 // 检测超时的CoroutineLock
-                TimeoutCheck(self);
+                TimeoutCheck(me);
 
                 // 循环过程中会有对象继续加入队列
-                while (self.nextFrameRun.Count > 0)
+                while (me.nextFrameRun.Count > 0)
                 {
-                    (int coroutineLockType, long key, int count) = self.nextFrameRun.Dequeue();
-                    self.Notify(coroutineLockType, key, count);
+                    (int coroutineLockType, long key, int count) = me.nextFrameRun.Dequeue();
+                    me.Notify(coroutineLockType, key, count);
                 }
             }
 
-            private void TimeoutCheck(CoroutineLockComponent self)
+            private void TimeoutCheck(CoroutineLockComponent me)
             {
                 // 超时的锁
-                if (self.timers.Count == 0)
+                if (me.timers.Count == 0)
                 {
                     return;
                 }
 
-                self.timeNow = TimeHelper.ClientFrameTime();
+                me.timeNow = TimeHelper.ClientFrameTime();
 
-                if (self.timeNow < self.minTime)
+                if (me.timeNow < me.minTime)
                 {
                     return;
                 }
 
-                self.timers.ForEachFunc(self.foreachFunc);
+                me.timers.ForEachFunc(me.foreachFunc);
 
-                self.timerOutTimer.Clear();
+                me.timerOutTimer.Clear();
 
-                while (self.timeOutIds.Count > 0)
+                while (me.timeOutIds.Count > 0)
                 {
-                    long time = self.timeOutIds.Dequeue();
-                    var list = self.timers[time];
+                    long time = me.timeOutIds.Dequeue();
+                    var list = me.timers[time];
                     for (int i = 0; i < list.Count; ++i)
                     {
                         CoroutineLockTimer coroutineLockTimer = list[i];
-                        self.timerOutTimer.Enqueue(coroutineLockTimer);
+                        me.timerOutTimer.Enqueue(coroutineLockTimer);
                     }
 
-                    self.timers.Remove(time);
+                    me.timers.Remove(time);
                 }
 
-                while (self.timerOutTimer.Count > 0)
+                while (me.timerOutTimer.Count > 0)
                 {
-                    CoroutineLockTimer coroutineLockTimer = self.timerOutTimer.Dequeue();
+                    CoroutineLockTimer coroutineLockTimer = me.timerOutTimer.Dequeue();
                     if (coroutineLockTimer.CoroutineLockInstanceId != coroutineLockTimer.CoroutineLock.InstanceId)
                     {
                         continue;
@@ -107,13 +107,13 @@ namespace ET
 
                     CoroutineLock coroutineLock = coroutineLockTimer.CoroutineLock;
                     // 超时直接调用下一个锁
-                    self.RunNextCoroutine(coroutineLock.coroutineLockType, coroutineLock.key, coroutineLock.level + 1);
+                    me.RunNextCoroutine(coroutineLock.coroutineLockType, coroutineLock.key, coroutineLock.level + 1);
                     coroutineLock.coroutineLockType = CoroutineLockType.None; // 上面调用了下一个, dispose不再调用
                 }
             }
         }
 
-        public static void RunNextCoroutine(this CoroutineLockComponent self, int coroutineLockType, long key, int level)
+        public static void RunNextCoroutine(this CoroutineLockComponent me, int coroutineLockType, long key, int level)
         {
             // 一个协程队列一帧处理超过100个,说明比较多了,打个warning,检查一下是否够正常
             if (level == 100)
@@ -121,26 +121,26 @@ namespace ET
                 Log.Warning($"too much coroutine level: {coroutineLockType} {key}");
             }
 
-            self.nextFrameRun.Enqueue((coroutineLockType, key, level));
+            me.nextFrameRun.Enqueue((coroutineLockType, key, level));
         }
 
-        private static void AddTimer(this CoroutineLockComponent self, long tillTime, CoroutineLock coroutineLock)
+        private static void AddTimer(this CoroutineLockComponent me, long tillTime, CoroutineLock coroutineLock)
         {
-            self.timers.Add(tillTime, new CoroutineLockTimer(coroutineLock));
-            if (tillTime < self.minTime)
+            me.timers.Add(tillTime, new CoroutineLockTimer(coroutineLock));
+            if (tillTime < me.minTime)
             {
-                self.minTime = tillTime;
+                me.minTime = tillTime;
             }
         }
 
-        public static async ETTask<CoroutineLock> Wait(this CoroutineLockComponent self, int coroutineLockType, long key, int time = 60000)
+        public static async ETTask<CoroutineLock> Wait(this CoroutineLockComponent me, int coroutineLockType, long key, int time = 60000)
         {
-            CoroutineLockQueueType coroutineLockQueueType = self.list[coroutineLockType];
+            CoroutineLockQueueType coroutineLockQueueType = me.list[coroutineLockType];
 
             if (!coroutineLockQueueType.TryGetValue(key, out CoroutineLockQueue queue))
             {
-                coroutineLockQueueType.Add(key, self.AddChildWithId<CoroutineLockQueue>(++self.idGenerator, true));
-                return self.CreateCoroutineLock(coroutineLockType, key, time, 1);
+                coroutineLockQueueType.Add(key, me.AddChildWithId<CoroutineLockQueue>(++me.idGenerator, true));
+                return me.CreateCoroutineLock(coroutineLockType, key, time, 1);
             }
 
             ETTask<CoroutineLock> tcs = ETTask<CoroutineLock>.Create(true);
@@ -148,20 +148,20 @@ namespace ET
             return await tcs;
         }
 
-        private static CoroutineLock CreateCoroutineLock(this CoroutineLockComponent self, int coroutineLockType, long key, int time, int level)
+        private static CoroutineLock CreateCoroutineLock(this CoroutineLockComponent me, int coroutineLockType, long key, int time, int level)
         {
-            CoroutineLock coroutineLock = self.AddChildWithId<CoroutineLock, int, long, int>(++self.idGenerator, coroutineLockType, key, level, true);
+            CoroutineLock coroutineLock = me.AddChildWithId<CoroutineLock, int, long, int>(++me.idGenerator, coroutineLockType, key, level, true);
             if (time > 0)
             {
-                self.AddTimer(TimeHelper.ClientFrameTime() + time, coroutineLock);
+                me.AddTimer(TimeHelper.ClientFrameTime() + time, coroutineLock);
             }
 
             return coroutineLock;
         }
 
-        public static void Notify(this CoroutineLockComponent self, int coroutineLockType, long key, int level)
+        public static void Notify(this CoroutineLockComponent me, int coroutineLockType, long key, int level)
         {
-            CoroutineLockQueueType coroutineLockQueueType = self.list[coroutineLockType];
+            CoroutineLockQueueType coroutineLockQueueType = me.list[coroutineLockType];
             if (!coroutineLockQueueType.TryGetValue(key, out CoroutineLockQueue queue))
             {
                 return;
@@ -174,7 +174,7 @@ namespace ET
             }
 
             CoroutineLockInfo coroutineLockInfo = queue.Dequeue();
-            coroutineLockInfo.Tcs.SetResult(self.CreateCoroutineLock(coroutineLockType, key, coroutineLockInfo.Time, level));
+            coroutineLockInfo.Tcs.SetResult(me.CreateCoroutineLock(coroutineLockType, key, coroutineLockInfo.Time, level));
         }
     }
 

@@ -4,7 +4,7 @@ namespace ET
 {
     public static class EUIModelViewHelper
     {
-        public static void AddUIScrollItems<K,T>(this K self, ref Dictionary<int, T> dictionary, int count) where K : Entity,IUILogic  where T : Entity,IAwake,IUIScrollItem
+        public static void AddUIScrollItems<K,T>(this K me, ref Dictionary<int, T> dictionary, int count) where K : Entity,IUILogic  where T : Entity,IAwake,IUIScrollItem
         {
             if (dictionary == null)
             {
@@ -23,7 +23,7 @@ namespace ET
             dictionary.Clear();
             for (int i = 0; i <= count; i++)
             {
-                T itemServer = self.AddChild<T>(true);
+                T itemServer = me.AddChild<T>(true);
                 dictionary.Add(i , itemServer);
             }
         }

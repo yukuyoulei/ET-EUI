@@ -6,9 +6,9 @@ namespace ET
 	[ObjectSystem]
 	public class ESCommonUIAwakeSystem : AwakeSystem<ESCommonUI,Transform> 
 	{
-		public override void Awake(ESCommonUI self,Transform transform)
+		public override void Awake(ESCommonUI me,Transform transform)
 		{
-			self.uiTransform = transform;
+			me.uiTransform = transform;
 		}
 	}
 
@@ -16,9 +16,9 @@ namespace ET
 	[ObjectSystem]
 	public class ESCommonUIDestroySystem : DestroySystem<ESCommonUI> 
 	{
-		public override void Destroy(ESCommonUI self)
+		public override void Destroy(ESCommonUI me)
 		{
-			self.DestroyWidget();
+			me.DestroyWidget();
 		}
 	}
 }

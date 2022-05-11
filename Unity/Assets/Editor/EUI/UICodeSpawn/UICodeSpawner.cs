@@ -106,20 +106,20 @@ public partial class UICodeSpawner
           strBuilder.AppendLine("");
 
 
-        strBuilder.AppendFormat("\t\tpublic static void RegisterUIEvent(this {0} self)\n",strDlgName)
+        strBuilder.AppendFormat("\t\tpublic static void RegisterUIEvent(this {0} me)\n",strDlgName)
                .AppendLine("\t\t{")
-               .AppendLine("\t\t ")
+               .AppendLine("\t\t\t")
                .AppendLine("\t\t}")
                .AppendLine();
 
 
-        strBuilder.AppendFormat("\t\tpublic static void ShowWindow(this {0} self, Entity contextData = null)\n", strDlgName);
+        strBuilder.AppendFormat("\t\tpublic static void ShowWindow(this {0} me, Entity contextData = null)\n", strDlgName);
         strBuilder.AppendLine("\t\t{");
           
         strBuilder.AppendLine("\t\t}")
 	        .AppendLine();
         
-        strBuilder.AppendLine("\t\t \r\n");
+        strBuilder.AppendLine("\t\t\t\r\n");
         
         strBuilder.AppendLine("\t}");
         strBuilder.AppendLine("}");
@@ -286,9 +286,9 @@ public partial class UICodeSpawner
         strBuilder.AppendLine("\t[ObjectSystem]");
         strBuilder.AppendFormat("\tpublic class {0}AwakeSystem : AwakeSystem<{1}> \r\n", strDlgComponentName, strDlgComponentName);
         strBuilder.AppendLine("\t{");
-        strBuilder.AppendFormat("\t\tpublic override void Awake({0} self)\n",strDlgComponentName);
+        strBuilder.AppendFormat("\t\tpublic override void Awake({0} me)\n",strDlgComponentName);
         strBuilder.AppendLine("\t\t{");
-        strBuilder.AppendLine("\t\t\tself.uiTransform = self.GetParent<UIBaseWindow>().uiTransform;");
+        strBuilder.AppendLine("\t\t\tme.uiTransform = me.GetParent<UIBaseWindow>().uiTransform;");
         strBuilder.AppendLine("\t\t}");
         strBuilder.AppendLine("\t}");
         strBuilder.AppendLine("\n");
@@ -297,9 +297,9 @@ public partial class UICodeSpawner
         strBuilder.AppendLine("\t[ObjectSystem]");
         strBuilder.AppendFormat("\tpublic class {0}DestroySystem : DestroySystem<{1}> \r\n", strDlgComponentName, strDlgComponentName);
         strBuilder.AppendLine("\t{");
-        strBuilder.AppendFormat("\t\tpublic override void Destroy({0} self)",strDlgComponentName);
+        strBuilder.AppendFormat("\t\tpublic override void Destroy({0} me)",strDlgComponentName);
         strBuilder.AppendLine("\n\t\t{");
-        strBuilder.AppendFormat("\t\t\tself.DestroyWidget();\r\n");
+        strBuilder.AppendFormat("\t\t\tme.DestroyWidget();\r\n");
         strBuilder.AppendLine("\t\t}");
         strBuilder.AppendLine("\t}");
         strBuilder.AppendLine("}");
@@ -362,7 +362,7 @@ public partial class UICodeSpawner
     
     public static void CreateDlgWidgetDisposeCode(ref StringBuilder strBuilder,bool isSelf = false)
     {
-	    string pointStr = isSelf ? "self" : "this";
+	    string pointStr = isSelf ? "me" : "this";
 	    foreach (KeyValuePair<string, List<Component>> pair in Path2WidgetCachedDict)
 	    {
 		    foreach (var info in pair.Value)

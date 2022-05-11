@@ -1266,28 +1266,28 @@ namespace ILRuntime.Mono.Cecil {
 			return (uint) DateTime.UtcNow.Subtract (new DateTime (1970, 1, 1)).TotalSeconds;
 		}
 
-		public static bool HasImage (this ModuleDefinition self)
+		public static bool HasImage (this ModuleDefinition me)
 		{
-			return self != null && self.HasImage;
+			return me != null && me.HasImage;
 		}
 
-		public static string GetFileName (this Stream self)
+		public static string GetFileName (this Stream me)
 		{
-			var file_stream = self as FileStream;
+			var file_stream = me as FileStream;
 			if (file_stream == null)
 				return string.Empty;
 
 			return Path.GetFullPath (file_stream.Name);
 		}
 
-		public static TargetRuntime ParseRuntime (this string self)
+		public static TargetRuntime ParseRuntime (this string me)
 		{
-			if (string.IsNullOrEmpty (self))
+			if (string.IsNullOrEmpty (me))
 				return TargetRuntime.Net_4_0;
 
-			switch (self [1]) {
+			switch (me [1]) {
 			case '1':
-				return self [3] == '0'
+				return me [3] == '0'
 					? TargetRuntime.Net_1_0
 					: TargetRuntime.Net_1_1;
 			case '2':
@@ -1318,13 +1318,13 @@ namespace ILRuntime.Mono.Cecil {
 			return module.MetadataKind != MetadataKind.Ecma335;
 		}
 
-		public static byte [] ReadAll (this Stream self)
+		public static byte [] ReadAll (this Stream me)
 		{
 			int read;
-			var memory = new MemoryStream ((int) self.Length);
+			var memory = new MemoryStream ((int) me.Length);
 			var buffer = new byte [1024];
 
-			while ((read = self.Read (buffer, 0, buffer.Length)) != 0)
+			while ((read = me.Read (buffer, 0, buffer.Length)) != 0)
 				memory.Write (buffer, 0, read);
 
 			return memory.ToArray ();

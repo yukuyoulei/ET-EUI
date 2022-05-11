@@ -9,13 +9,13 @@ namespace ET
         [ObjectSystem]
         public class OpcodeTypeComponentAwakeSystem: AwakeSystem<OpcodeTypeComponent>
         {
-            public override void Awake(OpcodeTypeComponent self)
+            public override void Awake(OpcodeTypeComponent me)
             {
-                OpcodeTypeComponent.Instance = self;
+                OpcodeTypeComponent.Instance = me;
                 
-                self.opcodeTypes.Clear();
-                self.typeOpcodes.Clear();
-                self.requestResponse.Clear();
+                me.opcodeTypes.Clear();
+                me.typeOpcodes.Clear();
+                me.requestResponse.Clear();
 
                 List<Type> types = Game.EventSystem.GetTypes(typeof (MessageAttribute));
                 foreach (Type type in types)
@@ -33,12 +33,12 @@ namespace ET
                     }
                 
 
-                    self.opcodeTypes.Add(messageAttribute.Opcode, type);
-                    self.typeOpcodes.Add(type, messageAttribute.Opcode);
+                    me.opcodeTypes.Add(messageAttribute.Opcode, type);
+                    me.typeOpcodes.Add(type, messageAttribute.Opcode);
 
                     if (OpcodeHelper.IsOuterMessage(messageAttribute.Opcode) && typeof (IActorMessage).IsAssignableFrom(type))
                     {
-                        self.outrActorMessage.Add(messageAttribute.Opcode);
+                        me.outrActorMessage.Add(messageAttribute.Opcode);
                     }
                 
                     // 检查request response
@@ -46,7 +46,7 @@ namespace ET
                     {
                         if (typeof (IActorLocationMessage).IsAssignableFrom(type))
                         {
-                            self.requestResponse.Add(type, typeof(ActorResponse));
+                            me.requestResponse.Add(type, typeof(ActorResponse));
                             continue;
                         }
                     
@@ -58,7 +58,7 @@ namespace ET
                         }
 
                         ResponseTypeAttribute responseTypeAttribute = attrs[0] as ResponseTypeAttribute;
-                        self.requestResponse.Add(type, Game.EventSystem.GetType($"ET.{responseTypeAttribute.Type}"));
+                        me.requestResponse.Add(type, Game.EventSystem.GetType($"ET.{responseTypeAttribute.Type}"));
                     }
                 }
             }
@@ -67,30 +67,30 @@ namespace ET
         [ObjectSystem]
         public class OpcodeTypeComponentDestroySystem: DestroySystem<OpcodeTypeComponent>
         {
-            public override void Destroy(OpcodeTypeComponent self)
+            public override void Destroy(OpcodeTypeComponent me)
             {
                 OpcodeTypeComponent.Instance = null;
             }
         }
 
-        public static bool IsOutrActorMessage(this OpcodeTypeComponent self, ushort opcode)
+        public static bool IsOutrActorMessage(this OpcodeTypeComponent me, ushort opcode)
         {
-            return self.outrActorMessage.Contains(opcode);
+            return me.outrActorMessage.Contains(opcode);
         }
 
-        public static ushort GetOpcode(this OpcodeTypeComponent self, Type type)
+        public static ushort GetOpcode(this OpcodeTypeComponent me, Type type)
         {
-            return self.typeOpcodes[type];
+            return me.typeOpcodes[type];
         }
 
-        public static Type GetType(this OpcodeTypeComponent self, ushort opcode)
+        public static Type GetType(this OpcodeTypeComponent me, ushort opcode)
         {
-            return self.opcodeTypes[opcode];
+            return me.opcodeTypes[opcode];
         }
 
-        public static Type GetResponseType(this OpcodeTypeComponent self, Type request)
+        public static Type GetResponseType(this OpcodeTypeComponent me, Type request)
         {
-            if (!self.requestResponse.TryGetValue(request, out Type response))
+            if (!me.requestResponse.TryGetValue(request, out Type response))
             {
                 throw new Exception($"not found response type, request type: {request.GetType().Name}");
             }

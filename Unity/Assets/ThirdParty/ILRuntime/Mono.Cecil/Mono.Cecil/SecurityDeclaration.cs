@@ -180,19 +180,19 @@ namespace ILRuntime.Mono.Cecil {
 	static partial class Mixin {
 
 		public static bool GetHasSecurityDeclarations (
-			this ISecurityDeclarationProvider self,
+			this ISecurityDeclarationProvider me,
 			ModuleDefinition module)
 		{
-			return module.HasImage () && module.Read (self, (provider, reader) => reader.HasSecurityDeclarations (provider));
+			return module.HasImage () && module.Read (me, (provider, reader) => reader.HasSecurityDeclarations (provider));
 		}
 
 		public static Collection<SecurityDeclaration> GetSecurityDeclarations (
-			this ISecurityDeclarationProvider self,
+			this ISecurityDeclarationProvider me,
 			ref Collection<SecurityDeclaration> variable,
 			ModuleDefinition module)
 		{
 			if (module.HasImage)
-				return module.Read (ref variable, self, (provider, reader) => reader.ReadSecurityDeclarations (provider));
+				return module.Read (ref variable, me, (provider, reader) => reader.ReadSecurityDeclarations (provider));
 
 			Interlocked.CompareExchange (ref variable, new Collection<SecurityDeclaration> (), null);
 			return variable;

@@ -10,26 +10,26 @@ namespace ET
 	public static  class DlgLoginSystem
 	{
 
-		public static void RegisterUIEvent(this DlgLogin self)
+		public static void RegisterUIEvent(this DlgLogin me)
 		{
-			self.View.E_LoginButton.AddListener(() => { self.OnLoginClickHandler();});
+			me.View.E_LoginButton.AddListener(() => { me.OnLoginClickHandler();});
 		}
 
-		public static void ShowWindow(this DlgLogin self, Entity contextData = null)
+		public static void ShowWindow(this DlgLogin me, Entity contextData = null)
 		{
 			
 		}
 		
-		public static void OnLoginClickHandler(this DlgLogin self)
+		public static void OnLoginClickHandler(this DlgLogin me)
 		{
 			LoginHelper.Login(
-				self.DomainScene(), 
+				me.DomainScene(), 
 				ConstValue.LoginAddress, 
-				self.View.E_AccountInputField.GetComponent<InputField>().text, 
-				self.View.E_PasswordInputField.GetComponent<InputField>().text).Coroutine();
+				me.View.E_AccountInputField.GetComponent<InputField>().text, 
+				me.View.E_PasswordInputField.GetComponent<InputField>().text).Coroutine();
 		}
 		
-		public static void HideWindow(this DlgLogin self)
+		public static void HideWindow(this DlgLogin me)
 		{
 
 		}

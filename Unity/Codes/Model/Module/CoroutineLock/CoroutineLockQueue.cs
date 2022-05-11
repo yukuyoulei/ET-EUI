@@ -14,29 +14,29 @@ namespace ET
         [ObjectSystem]
         public class CoroutineLockQueueAwakeSystem: AwakeSystem<CoroutineLockQueue>
         {
-            public override void Awake(CoroutineLockQueue self)
+            public override void Awake(CoroutineLockQueue me)
             {
-                self.queue.Clear();
+                me.queue.Clear();
             }
         }
 
         [ObjectSystem]
         public class CoroutineLockQueueDestroySystem: DestroySystem<CoroutineLockQueue>
         {
-            public override void Destroy(CoroutineLockQueue self)
+            public override void Destroy(CoroutineLockQueue me)
             {
-                self.queue.Clear();
+                me.queue.Clear();
             }
         }
         
-        public static void Add(this CoroutineLockQueue self, ETTask<CoroutineLock> tcs, int time)
+        public static void Add(this CoroutineLockQueue me, ETTask<CoroutineLock> tcs, int time)
         {
-            self.queue.Enqueue(new CoroutineLockInfo(){Tcs = tcs, Time = time});
+            me.queue.Enqueue(new CoroutineLockInfo(){Tcs = tcs, Time = time});
         }
         
-        public static CoroutineLockInfo Dequeue(this CoroutineLockQueue self)
+        public static CoroutineLockInfo Dequeue(this CoroutineLockQueue me)
         {
-            return self.queue.Dequeue();
+            return me.queue.Dequeue();
         }
     }
     

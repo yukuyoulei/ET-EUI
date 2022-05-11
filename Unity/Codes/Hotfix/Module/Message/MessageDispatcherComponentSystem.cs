@@ -6,29 +6,29 @@ namespace ET
     [ObjectSystem]
     public class MessageDispatcherComponentAwakeSystem: AwakeSystem<MessageDispatcherComponent>
     {
-        public override void Awake(MessageDispatcherComponent self)
+        public override void Awake(MessageDispatcherComponent me)
         {
-            MessageDispatcherComponent.Instance = self;
-            self.Load();
+            MessageDispatcherComponent.Instance = me;
+            me.Load();
         }
     }
 
     [ObjectSystem]
     public class MessageDispatcherComponentLoadSystem: LoadSystem<MessageDispatcherComponent>
     {
-        public override void Load(MessageDispatcherComponent self)
+        public override void Load(MessageDispatcherComponent me)
         {
-            self.Load();
+            me.Load();
         }
     }
 
     [ObjectSystem]
     public class MessageDispatcherComponentDestroySystem: DestroySystem<MessageDispatcherComponent>
     {
-        public override void Destroy(MessageDispatcherComponent self)
+        public override void Destroy(MessageDispatcherComponent me)
         {
             MessageDispatcherComponent.Instance = null;
-            self.Handlers.Clear();
+            me.Handlers.Clear();
         }
     }
 
@@ -38,9 +38,9 @@ namespace ET
     [FriendClass(typeof(MessageDispatcherComponent))]
     public static class MessageDispatcherComponentHelper
     {
-        public static void Load(this MessageDispatcherComponent self)
+        public static void Load(this MessageDispatcherComponent me)
         {
-            self.Handlers.Clear();
+            me.Handlers.Clear();
 
             List<Type> types = Game.EventSystem.GetTypes(typeof (MessageHandlerAttribute));
 
@@ -61,24 +61,24 @@ namespace ET
                     continue;
                 }
 
-                self.RegisterHandler(opcode, iMHandler);
+                me.RegisterHandler(opcode, iMHandler);
             }
         }
 
-        public static void RegisterHandler(this MessageDispatcherComponent self, ushort opcode, IMHandler handler)
+        public static void RegisterHandler(this MessageDispatcherComponent me, ushort opcode, IMHandler handler)
         {
-            if (!self.Handlers.ContainsKey(opcode))
+            if (!me.Handlers.ContainsKey(opcode))
             {
-                self.Handlers.Add(opcode, new List<IMHandler>());
+                me.Handlers.Add(opcode, new List<IMHandler>());
             }
 
-            self.Handlers[opcode].Add(handler);
+            me.Handlers[opcode].Add(handler);
         }
 
-        public static void Handle(this MessageDispatcherComponent self, Session session, ushort opcode, object message)
+        public static void Handle(this MessageDispatcherComponent me, Session session, ushort opcode, object message)
         {
             List<IMHandler> actions;
-            if (!self.Handlers.TryGetValue(opcode, out actions))
+            if (!me.Handlers.TryGetValue(opcode, out actions))
             {
                 Log.Error($"消息没有处理: {opcode} {message}");
                 return;

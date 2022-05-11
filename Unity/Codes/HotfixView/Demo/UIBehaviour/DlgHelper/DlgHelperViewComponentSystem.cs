@@ -6,9 +6,9 @@ namespace ET
 	[ObjectSystem]
 	public class DlgHelperViewComponentAwakeSystem : AwakeSystem<DlgHelperViewComponent> 
 	{
-		public override void Awake(DlgHelperViewComponent self)
+		public override void Awake(DlgHelperViewComponent me)
 		{
-			self.uiTransform = self.GetParent<UIBaseWindow>().uiTransform;
+			me.uiTransform = me.GetParent<UIBaseWindow>().uiTransform;
 		}
 	}
 
@@ -16,9 +16,9 @@ namespace ET
 	[ObjectSystem]
 	public class DlgHelperViewComponentDestroySystem : DestroySystem<DlgHelperViewComponent> 
 	{
-		public override void Destroy(DlgHelperViewComponent self)
+		public override void Destroy(DlgHelperViewComponent me)
 		{
-			self.DestroyWidget();
+			me.DestroyWidget();
 		}
 	}
 }

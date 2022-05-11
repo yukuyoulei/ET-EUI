@@ -47,10 +47,10 @@ public partial class UICodeSpawner
         strBuilder.AppendLine("\t[ObjectSystem]");
         strBuilder.AppendFormat("\tpublic class Scroll_{0}DestroySystem : DestroySystem<Scroll_{1}> \r\n", strDlgName, strDlgName);
         strBuilder.AppendLine("\t{");
-        strBuilder.AppendFormat("\t\tpublic override void Destroy( Scroll_{0} self )",strDlgName);
+        strBuilder.AppendFormat("\t\tpublic override void Destroy( Scroll_{0} me )",strDlgName);
         strBuilder.AppendLine("\n\t\t{");
         
-        strBuilder.AppendFormat("\t\t\tself.DestroyWidget();\r\n");
+        strBuilder.AppendFormat("\t\t\tme.DestroyWidget();\r\n");
 
         strBuilder.AppendLine("\t\t}");
         strBuilder.AppendLine("\t}");

@@ -7,7 +7,7 @@ namespace ET
         [ObjectSystem]
         public class CurrentScenesComponentAwakeSystem: AwakeSystem<CurrentScenesComponent>
         {
-            public override void Awake(CurrentScenesComponent self)
+            public override void Awake(CurrentScenesComponent me)
             {
             }
         }

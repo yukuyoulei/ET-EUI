@@ -22,9 +22,9 @@ namespace ILRuntime.Mono.Cecil {
 
 	static partial class Mixin {
 
-		public static bool ContainsGenericParameter (this IGenericInstance self)
+		public static bool ContainsGenericParameter (this IGenericInstance me)
 		{
-			var arguments = self.GenericArguments;
+			var arguments = me.GenericArguments;
 
 			for (int i = 0; i < arguments.Count; i++)
 				if (arguments [i].ContainsGenericParameter)
@@ -33,10 +33,10 @@ namespace ILRuntime.Mono.Cecil {
 			return false;
 		}
 
-		public static void GenericInstanceFullName (this IGenericInstance self, StringBuilder builder)
+		public static void GenericInstanceFullName (this IGenericInstance me, StringBuilder builder)
 		{
 			builder.Append ("<");
-			var arguments = self.GenericArguments;
+			var arguments = me.GenericArguments;
 			for (int i = 0; i < arguments.Count; i++) {
 				if (i > 0)
 					builder.Append (",");

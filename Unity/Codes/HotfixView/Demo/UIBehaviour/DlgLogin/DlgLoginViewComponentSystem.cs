@@ -6,9 +6,9 @@ namespace ET
 	[ObjectSystem]
 	public class DlgLoginViewComponentAwakeSystem : AwakeSystem<DlgLoginViewComponent> 
 	{
-		public override void Awake(DlgLoginViewComponent self)
+		public override void Awake(DlgLoginViewComponent me)
 		{
-			self.uiTransform = self.GetParent<UIBaseWindow>().uiTransform;
+			me.uiTransform = me.GetParent<UIBaseWindow>().uiTransform;
 		}
 	}
 
@@ -16,9 +16,9 @@ namespace ET
 	[ObjectSystem]
 	public class DlgLoginViewComponentDestroySystem : DestroySystem<DlgLoginViewComponent> 
 	{
-		public override void Destroy(DlgLoginViewComponent self)
+		public override void Destroy(DlgLoginViewComponent me)
 		{
-			self.DestroyWidget();
+			me.DestroyWidget();
 		}
 	}
 }

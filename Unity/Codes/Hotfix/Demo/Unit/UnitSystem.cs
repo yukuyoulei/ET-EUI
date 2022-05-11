@@ -3,9 +3,9 @@ namespace ET
     [ObjectSystem]
     public class UnitSystem: AwakeSystem<Unit, int>
     {
-        public override void Awake(Unit self, int configId)
+        public override void Awake(Unit me, int configId)
         {
-            self.ConfigId = configId;
+            me.ConfigId = configId;
         }
     }
 }

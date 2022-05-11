@@ -7,18 +7,18 @@ namespace ET
     [ObjectSystem]
     public class UIComponentAwakeSystem : AwakeSystem<UIComponent>
     {
-        public override void Awake(UIComponent self)
+        public override void Awake(UIComponent me)
         {
-            self.Awake();
+            me.Awake();
         }
     }
     
     [ObjectSystem]
     public class UIComponentDestroySystem : DestroySystem<UIComponent>
     {
-        public override void Destroy(UIComponent self)
+        public override void Destroy(UIComponent me)
         {
-            self.Destroy();
+            me.Destroy();
         }
     }
 
@@ -29,23 +29,23 @@ namespace ET
     [FriendClass(typeof(UIComponent))]
     public static class UIComponentSystem
     {
-        public static void Awake(this UIComponent self)
+        public static void Awake(this UIComponent me)
         {
-            if (null != self.AllWindowsDic)
+            if (null != me.AllWindowsDic)
             {
-                self.AllWindowsDic.Clear();
+                me.AllWindowsDic.Clear();
             }
-            if (null != self.VisibleWindowsDic)
+            if (null != me.VisibleWindowsDic)
             {
-                self.VisibleWindowsDic.Clear();
+                me.VisibleWindowsDic.Clear();
             }
-            if (self.VisibleWindowsQueue != null)
+            if (me.VisibleWindowsQueue != null)
             {
-                self.VisibleWindowsQueue.Clear();
+                me.VisibleWindowsQueue.Clear();
             }
-            if (self.HideWindowsStack != null)
+            if (me.HideWindowsStack != null)
             {
-                self.HideWindowsStack.Clear();
+                me.HideWindowsStack.Clear();
             }
         }
         
@@ -54,50 +54,50 @@ namespace ET
         /// </summary>
         /// <OtherParam name="id"></OtherParam>
         /// <returns></returns>
-        public static bool IsWindowVisible(this UIComponent self,WindowID id)
+        public static bool IsWindowVisible(this UIComponent me,WindowID id)
         {
-            return self.VisibleWindowsDic.ContainsKey((int)id);
+            return me.VisibleWindowsDic.ContainsKey((int)id);
         }
         
         
         /// <summary>
         /// 隐藏最新出现的窗口
         /// </summary>
-        public static void HideLastWindows(this UIComponent self)
+        public static void HideLastWindows(this UIComponent me)
         {
-            if (self.VisibleWindowsQueue.Count <= 0)
+            if (me.VisibleWindowsQueue.Count <= 0)
             {
                 return;
             }
-            WindowID windowID  = self.VisibleWindowsQueue[self.VisibleWindowsQueue.Count - 1];
-            if (!self.IsWindowVisible(windowID))
+            WindowID windowID  = me.VisibleWindowsQueue[me.VisibleWindowsQueue.Count - 1];
+            if (!me.IsWindowVisible(windowID))
             {
                return;
             }
-            self.HideWindow(windowID);
+            me.HideWindow(windowID);
         }
         
         /// <summary>
         /// 彻底关闭最新出现的窗口
         /// </summary>
-        public static void CloseLastWindows(this UIComponent self)
+        public static void CloseLastWindows(this UIComponent me)
         {
-            if (self.VisibleWindowsQueue.Count <= 0)
+            if (me.VisibleWindowsQueue.Count <= 0)
             {
                 return;
             }
-            WindowID windowID  = self.VisibleWindowsQueue[self.VisibleWindowsQueue.Count - 1];
-            if (!self.IsWindowVisible(windowID))
+            WindowID windowID  = me.VisibleWindowsQueue[me.VisibleWindowsQueue.Count - 1];
+            if (!me.IsWindowVisible(windowID))
             {
                 return;
             }
-            self.CloseWindow(windowID);
+            me.CloseWindow(windowID);
         }
         
-        public static void ShowWindow<T>(this UIComponent self,WindowID preWindowID = WindowID.WindowID_Invaild, ShowWindowData showData = null) where T : Entity
+        public static void ShowWindow<T>(this UIComponent me,WindowID preWindowID = WindowID.WindowID_Invaild, ShowWindowData showData = null) where T : Entity
         {
-            WindowID windowsId = self.GetWindowIdByGeneric<T>();
-            self.ShowWindow(windowsId,preWindowID,showData);
+            WindowID windowsId = me.GetWindowIdByGeneric<T>();
+            me.ShowWindow(windowsId,preWindowID,showData);
         }
         
         /// <summary>
@@ -105,27 +105,27 @@ namespace ET
         /// </summary>
         /// <OtherParam name="id"></OtherParam>
         /// <OtherParam name="showData"></OtherParam>
-        public static void ShowWindow(this UIComponent self,WindowID id, WindowID preWindowID = WindowID.WindowID_Invaild, ShowWindowData showData = null)
+        public static void ShowWindow(this UIComponent me,WindowID id, WindowID preWindowID = WindowID.WindowID_Invaild, ShowWindowData showData = null)
         {
-            UIBaseWindow baseWindow = self.ReadyToShowBaseWindow(id, showData);
+            UIBaseWindow baseWindow = me.ReadyToShowBaseWindow(id, showData);
             if (null != baseWindow)
             {
-                self.RealShowWindow(baseWindow, id, showData,preWindowID);
+                me.RealShowWindow(baseWindow, id, showData,preWindowID);
             }
         }
 
-        public static async ETTask ShowWindowAsync(this UIComponent self,WindowID id,WindowID preWindowID = WindowID.WindowID_Invaild, ShowWindowData showData = null)
+        public static async ETTask ShowWindowAsync(this UIComponent me,WindowID id,WindowID preWindowID = WindowID.WindowID_Invaild, ShowWindowData showData = null)
         {
             try
             {
-                if (self.LoadingWindows.Contains(id))
+                if (me.LoadingWindows.Contains(id))
                 {
                     return;
                 }
-                UIBaseWindow baseWindow = await self.ShowBaseWindowAsync(id, showData);
+                UIBaseWindow baseWindow = await me.ShowBaseWindowAsync(id, showData);
                 if (null != baseWindow)
                 {
-                    self.RealShowWindow(baseWindow, id, showData,preWindowID);
+                    me.RealShowWindow(baseWindow, id, showData,preWindowID);
                 }
             }
             catch (Exception e)
@@ -135,36 +135,36 @@ namespace ET
             }
         }
         
-        public static async ETTask ShowWindowAsync<T>(this UIComponent self,WindowID preWindowID = WindowID.WindowID_Invaild, ShowWindowData showData = null) where T : Entity
+        public static async ETTask ShowWindowAsync<T>(this UIComponent me,WindowID preWindowID = WindowID.WindowID_Invaild, ShowWindowData showData = null) where T : Entity
         {
-            WindowID windowsId = self.GetWindowIdByGeneric<T>();
-           await self.ShowWindowAsync(windowsId,preWindowID,showData);
+            WindowID windowsId = me.GetWindowIdByGeneric<T>();
+           await me.ShowWindowAsync(windowsId,preWindowID,showData);
         }
         
-        public static void HideAndShowWindowStack(this UIComponent self,WindowID hideWindowId, WindowID showWindowId)
+        public static void HideAndShowWindowStack(this UIComponent me,WindowID hideWindowId, WindowID showWindowId)
         {
-            self.HideWindow(hideWindowId,true);
-            self.ShowWindow(showWindowId,preWindowID:hideWindowId);
+            me.HideWindow(hideWindowId,true);
+            me.ShowWindow(showWindowId,preWindowID:hideWindowId);
         }
         
-        public static void HideAndShowWindowStack<T,K>(this UIComponent self) where T : Entity  where K : Entity
+        public static void HideAndShowWindowStack<T,K>(this UIComponent me) where T : Entity  where K : Entity
         {
-            WindowID hideWindowId = self.GetWindowIdByGeneric<T>();
-            WindowID showWindowId = self.GetWindowIdByGeneric<K>();
-            self.HideAndShowWindowStack(hideWindowId,showWindowId);
+            WindowID hideWindowId = me.GetWindowIdByGeneric<T>();
+            WindowID showWindowId = me.GetWindowIdByGeneric<K>();
+            me.HideAndShowWindowStack(hideWindowId,showWindowId);
         }
         
-        public static async ETTask HideAndShowWindowStackAsync(this UIComponent self,WindowID hideWindowId, WindowID showWindowId)
+        public static async ETTask HideAndShowWindowStackAsync(this UIComponent me,WindowID hideWindowId, WindowID showWindowId)
         {
-            self.HideWindow(hideWindowId,true);
-            await self.ShowWindowAsync(showWindowId,preWindowID:hideWindowId);
+            me.HideWindow(hideWindowId,true);
+            await me.ShowWindowAsync(showWindowId,preWindowID:hideWindowId);
         }
         
-        public static async ETTask HideAndShowWindowStackAsync<T,K>(this UIComponent self) where T : Entity  where K : Entity
+        public static async ETTask HideAndShowWindowStackAsync<T,K>(this UIComponent me) where T : Entity  where K : Entity
         {
-            WindowID hideWindowId = self.GetWindowIdByGeneric<T>();
-            WindowID showWindowId = self.GetWindowIdByGeneric<K>();
-            await self.HideAndShowWindowStackAsync(hideWindowId,showWindowId);
+            WindowID hideWindowId = me.GetWindowIdByGeneric<T>();
+            WindowID showWindowId = me.GetWindowIdByGeneric<K>();
+            await me.HideAndShowWindowStackAsync(hideWindowId,showWindowId);
         }
         
         
@@ -173,9 +173,9 @@ namespace ET
         /// </summary>
         /// <OtherParam name="id"></OtherParam>
         /// <OtherParam name="onComplete"></OtherParam>
-        public static void HideWindow(this UIComponent self,WindowID id,bool isPushToStack = false)
+        public static void HideWindow(this UIComponent me,WindowID id,bool isPushToStack = false)
         {
-            if ( !self.CheckDirectlyHide(id))
+            if ( !me.CheckDirectlyHide(id))
             {
                 Log.Warning($"检测关闭 WindowsID: {id} 失败！");
                 return;
@@ -186,19 +186,19 @@ namespace ET
                 return;
             }
 
-            if (self.HideWindowsStack.Count <= 0)
+            if (me.HideWindowsStack.Count <= 0)
             {
                 return;
             }
 
-            WindowID preWindowID = self.HideWindowsStack.Pop(); ;
-            self.ShowWindow(preWindowID);
+            WindowID preWindowID = me.HideWindowsStack.Pop(); ;
+            me.ShowWindow(preWindowID);
         }
         
-        public static void  HideWindow<T>(this UIComponent self,bool isPushToStack = false) where T : Entity 
+        public static void  HideWindow<T>(this UIComponent me,bool isPushToStack = false) where T : Entity 
         {
-            WindowID hideWindowId = self.GetWindowIdByGeneric<T>();
-            self.HideWindow(hideWindowId,isPushToStack);
+            WindowID hideWindowId = me.GetWindowIdByGeneric<T>();
+            me.HideWindow(hideWindowId,isPushToStack);
         }
         
         
@@ -206,9 +206,9 @@ namespace ET
         /// 卸载指定的UI窗口实例
         /// </summary>
         /// <OtherParam name="id"></OtherParam>
-        public static void UnLoadWindow(this UIComponent self,WindowID id,bool isDispose = true)
+        public static void UnLoadWindow(this UIComponent me,WindowID id,bool isDispose = true)
         {
-            UIBaseWindow baseWindow = self.GetUIBaseWindow(id);
+            UIBaseWindow baseWindow = me.GetUIBaseWindow(id);
             if (null == baseWindow)
             {
               Log.Error($"UIBaseWindow WindowId {id} is null!!!");
@@ -223,74 +223,74 @@ namespace ET
             }
             if (isDispose)
             {
-                self.AllWindowsDic.Remove((int) id);
-                self.VisibleWindowsDic.Remove((int) id);
-                self.VisibleWindowsQueue.Remove(id);
+                me.AllWindowsDic.Remove((int) id);
+                me.VisibleWindowsDic.Remove((int) id);
+                me.VisibleWindowsQueue.Remove(id);
                 baseWindow?.Dispose();
             }
         }
 
-        public static void  UnLoadWindow<T>(this UIComponent self) where T : Entity 
+        public static void  UnLoadWindow<T>(this UIComponent me) where T : Entity 
         {
-            WindowID hideWindowId = self.GetWindowIdByGeneric<T>();
-            self.UnLoadWindow(hideWindowId);
+            WindowID hideWindowId = me.GetWindowIdByGeneric<T>();
+            me.UnLoadWindow(hideWindowId);
         }
 
-        private static  UIBaseWindow  ReadyToShowBaseWindow(this UIComponent self,WindowID id, ShowWindowData showData = null)
+        private static  UIBaseWindow  ReadyToShowBaseWindow(this UIComponent me,WindowID id, ShowWindowData showData = null)
         {
-            UIBaseWindow baseWindow = self.GetUIBaseWindow(id);
+            UIBaseWindow baseWindow = me.GetUIBaseWindow(id);
             // 如果UI不存在开始实例化新的窗口
             if (null == baseWindow)
             {
-                baseWindow = self.AddChild<UIBaseWindow>();
+                baseWindow = me.AddChild<UIBaseWindow>();
                 baseWindow.WindowID = id;
-                self.LoadBaseWindows(baseWindow);
+                me.LoadBaseWindows(baseWindow);
             }
             
             if (!baseWindow.IsPreLoad)
             {
-                self.LoadBaseWindows(baseWindow);
+                me.LoadBaseWindows(baseWindow);
             }
             return baseWindow;
         }
 
-        private static async ETTask<UIBaseWindow> ShowBaseWindowAsync(this UIComponent self,WindowID id, ShowWindowData showData = null)
+        private static async ETTask<UIBaseWindow> ShowBaseWindowAsync(this UIComponent me,WindowID id, ShowWindowData showData = null)
         {
-            UIBaseWindow baseWindow = self.GetUIBaseWindow(id);
+            UIBaseWindow baseWindow = me.GetUIBaseWindow(id);
             if (null == baseWindow)
             {
                 if (UIPathComponent.Instance.WindowPrefabPath.ContainsKey((int)id))
                 {
-                    baseWindow          = self.AddChild<UIBaseWindow>();
+                    baseWindow          = me.AddChild<UIBaseWindow>();
                     baseWindow.WindowID = id;
-                    await self.LoadBaseWindowsAsync(baseWindow);
+                    await me.LoadBaseWindowsAsync(baseWindow);
                 }
             }
             if (!baseWindow.IsPreLoad)
             {
-                await self.LoadBaseWindowsAsync(baseWindow);
+                await me.LoadBaseWindowsAsync(baseWindow);
             }
             return baseWindow;
         }
         
-        public static void Destroy(this UIComponent self)
+        public static void Destroy(this UIComponent me)
         {
-            self.ClearAllWindow();
+            me.ClearAllWindow();
         }
 
-        private static UIBaseWindow GetUIBaseWindow(this UIComponent self,WindowID id)
+        private static UIBaseWindow GetUIBaseWindow(this UIComponent me,WindowID id)
         {
-            if (self.AllWindowsDic.ContainsKey((int)id))
+            if (me.AllWindowsDic.ContainsKey((int)id))
             {
-                return self.AllWindowsDic[(int)id];
+                return me.AllWindowsDic[(int)id];
             }
             return null;
         }
         
-        public static T GetDlgLogic<T>(this UIComponent self,bool isNeedShowState = false) where  T : Entity
+        public static T GetDlgLogic<T>(this UIComponent me,bool isNeedShowState = false) where  T : Entity
         {
-            WindowID windowsId = self.GetWindowIdByGeneric<T>();
-            UIBaseWindow baseWindow = self.GetUIBaseWindow(windowsId);
+            WindowID windowsId = me.GetWindowIdByGeneric<T>();
+            UIBaseWindow baseWindow = me.GetUIBaseWindow(windowsId);
             if ( null == baseWindow )
             {
                 Log.Warning($"{windowsId} is not created!");
@@ -304,7 +304,7 @@ namespace ET
 
             if (isNeedShowState )
             {
-                if ( !self.IsWindowVisible(windowsId) )
+                if ( !me.IsWindowVisible(windowsId) )
                 {
                     Log.Warning($"{windowsId} is need show state!");
                     return null;
@@ -314,7 +314,7 @@ namespace ET
             return baseWindow.GetComponent<T>();
         }
         
-        public static WindowID GetWindowIdByGeneric<T>(this UIComponent self) where  T : Entity
+        public static WindowID GetWindowIdByGeneric<T>(this UIComponent me) where  T : Entity
         {
             if ( UIPathComponent.Instance.WindowTypeIdDict.TryGetValue(typeof(T).Name,out int windowsId) )
             {
@@ -324,52 +324,52 @@ namespace ET
             return  WindowID.WindowID_Invaild;
         }
         
-        public static void CloseWindow(this UIComponent self,WindowID windowId)
+        public static void CloseWindow(this UIComponent me,WindowID windowId)
         {
-            if (!self.VisibleWindowsDic.ContainsKey((int)windowId))
+            if (!me.VisibleWindowsDic.ContainsKey((int)windowId))
             {
                 return;
             }
-            self.HideWindow(windowId);
-            self.UnLoadWindow(windowId);
+            me.HideWindow(windowId);
+            me.UnLoadWindow(windowId);
             Debug.Log("<color=magenta>## close window without PopNavigationWindow() ##</color>");
         }
         
-        public static void  CloseWindow<T>(this UIComponent self) where T : Entity 
+        public static void  CloseWindow<T>(this UIComponent me) where T : Entity 
         {
-            WindowID hideWindowId = self.GetWindowIdByGeneric<T>();
-            self.CloseWindow(hideWindowId);
+            WindowID hideWindowId = me.GetWindowIdByGeneric<T>();
+            me.CloseWindow(hideWindowId);
         }
         
-        public static void ClearAllWindow(this UIComponent self)
+        public static void ClearAllWindow(this UIComponent me)
         {
-            if (self.AllWindowsDic == null)
+            if (me.AllWindowsDic == null)
             {
                 return;
             }
-            foreach (KeyValuePair<int, UIBaseWindow> window in self.AllWindowsDic)
+            foreach (KeyValuePair<int, UIBaseWindow> window in me.AllWindowsDic)
             {
                 UIBaseWindow baseWindow = window.Value;
                 if (baseWindow == null|| baseWindow.IsDisposed)
                 {
                     continue;
                 }
-                self.HideWindow(baseWindow.WindowID);
-                self.UnLoadWindow(baseWindow.WindowID,false);
+                me.HideWindow(baseWindow.WindowID);
+                me.UnLoadWindow(baseWindow.WindowID,false);
                 baseWindow?.Dispose();
             }
-            self.AllWindowsDic.Clear();
-            self.VisibleWindowsDic.Clear();
-            self.LoadingWindows.Clear();
-            self.VisibleWindowsQueue.Clear();
-            self.HideWindowsStack.Clear();
-            self.UIBaseWindowlistCached.Clear();
+            me.AllWindowsDic.Clear();
+            me.VisibleWindowsDic.Clear();
+            me.LoadingWindows.Clear();
+            me.VisibleWindowsQueue.Clear();
+            me.HideWindowsStack.Clear();
+            me.UIBaseWindowlistCached.Clear();
         }
         
-        public static void HideAllShownWindow(this UIComponent self,bool includeFixed = false)
+        public static void HideAllShownWindow(this UIComponent me,bool includeFixed = false)
         {
-            self.UIBaseWindowlistCached.Clear();
-            foreach (KeyValuePair<int, UIBaseWindow> window in self.VisibleWindowsDic)
+            me.UIBaseWindowlistCached.Clear();
+            foreach (KeyValuePair<int, UIBaseWindow> window in me.VisibleWindowsDic)
             {
                 if (window.Value.WindowData.windowType == UIWindowType.Fixed && !includeFixed)
                     continue;
@@ -378,63 +378,63 @@ namespace ET
                     continue;
                 }
                 
-                self.UIBaseWindowlistCached.Add((WindowID)window.Key);
+                me.UIBaseWindowlistCached.Add((WindowID)window.Key);
                 window.Value.UIPrefabGameObject?.SetActive(false);
                 UIEventComponent.Instance.GetUIEventHandler(window.Value.WindowID).OnHideWindow(window.Value);
             }
-            if (self.UIBaseWindowlistCached.Count > 0)
+            if (me.UIBaseWindowlistCached.Count > 0)
             {
-                for (int i = 0; i < self.UIBaseWindowlistCached.Count; i++)
+                for (int i = 0; i < me.UIBaseWindowlistCached.Count; i++)
                 {
-                    self.VisibleWindowsDic.Remove((int)self.UIBaseWindowlistCached[i]);
+                    me.VisibleWindowsDic.Remove((int)me.UIBaseWindowlistCached[i]);
                 }
             }
-            self.VisibleWindowsQueue.Clear();
-            self.HideWindowsStack.Clear();
+            me.VisibleWindowsQueue.Clear();
+            me.HideWindowsStack.Clear();
         }
         
-        private static void RealShowWindow(this UIComponent self,UIBaseWindow baseWindow, WindowID id, ShowWindowData showData = null,WindowID preWindowID = WindowID.WindowID_Invaild)
+        private static void RealShowWindow(this UIComponent me,UIBaseWindow baseWindow, WindowID id, ShowWindowData showData = null,WindowID preWindowID = WindowID.WindowID_Invaild)
         {
             if (baseWindow.WindowData.windowType == UIWindowType.PopUp && baseWindow.WindowID != WindowID.WindowID_MessageBox)
             {
-                self.VisibleWindowsQueue.Add(id);
+                me.VisibleWindowsQueue.Add(id);
             }
             
             Entity contextData = showData == null ? null : showData.contextData;
             baseWindow.UIPrefabGameObject?.SetActive(true);
             UIEventComponent.Instance.GetUIEventHandler(id).OnShowWindow(baseWindow,contextData);
             
-            self.VisibleWindowsDic[(int)id] = baseWindow;
+            me.VisibleWindowsDic[(int)id] = baseWindow;
             if (preWindowID != WindowID.WindowID_Invaild)
             {
-                self.HideWindowsStack.Push(preWindowID);
+                me.HideWindowsStack.Push(preWindowID);
             }
          
             Debug.Log("<color=magenta>### current Navigation window </color>" + baseWindow.WindowID.ToString());
         }
         
-        private static bool CheckDirectlyHide(this UIComponent self,WindowID id)
+        private static bool CheckDirectlyHide(this UIComponent me,WindowID id)
         {
-            if (!self.VisibleWindowsDic.ContainsKey((int)id))
+            if (!me.VisibleWindowsDic.ContainsKey((int)id))
             {
                 return false;
             }
 
-            UIBaseWindow baseWindow = self.VisibleWindowsDic[(int)id];
+            UIBaseWindow baseWindow = me.VisibleWindowsDic[(int)id];
             if (baseWindow != null && !baseWindow.IsDisposed )
             {
                 baseWindow.UIPrefabGameObject?.SetActive(false);
                 UIEventComponent.Instance.GetUIEventHandler(id).OnHideWindow(baseWindow);
             }
-            self.VisibleWindowsDic.Remove((int)id);
-            self.VisibleWindowsQueue.Remove(id);
+            me.VisibleWindowsDic.Remove((int)id);
+            me.VisibleWindowsQueue.Remove(id);
             return true;
         }
         
         /// <summary>
         /// 同步加载
         /// </summary>
-        private static void LoadBaseWindows(this UIComponent self,  UIBaseWindow baseWindow)
+        private static void LoadBaseWindows(this UIComponent me,  UIBaseWindow baseWindow)
         {
             if ( !UIPathComponent.Instance.WindowPrefabPath.TryGetValue((int)baseWindow.WindowID,out string value) )
             {
@@ -454,13 +454,13 @@ namespace ET
             UIEventComponent.Instance.GetUIEventHandler(baseWindow.WindowID).OnInitComponent(baseWindow);
             UIEventComponent.Instance.GetUIEventHandler(baseWindow.WindowID).OnRegisterUIEvent(baseWindow);
             
-            self.AllWindowsDic[(int)baseWindow.WindowID] = baseWindow;
+            me.AllWindowsDic[(int)baseWindow.WindowID] = baseWindow;
         }
 
         /// <summary>
         /// 异步加载
         /// </summary>
-        private static async ETTask LoadBaseWindowsAsync(this UIComponent self,  UIBaseWindow baseWindow)
+        private static async ETTask LoadBaseWindowsAsync(this UIComponent me,  UIBaseWindow baseWindow)
         {
             
             if ( !UIPathComponent.Instance.WindowPrefabPath.TryGetValue((int)baseWindow.WindowID,out string value) )
@@ -468,7 +468,7 @@ namespace ET
                 Log.Error($"{baseWindow.WindowID} is not Exist!");
                 return;
             }
-            self.LoadingWindows.Add(baseWindow.WindowID);
+            me.LoadingWindows.Add(baseWindow.WindowID);
             await ResourcesComponent.Instance.LoadBundleAsync(value.StringToAB());
             GameObject go                      = ResourcesComponent.Instance.GetAsset(value.StringToAB(), value ) as GameObject;
             baseWindow.UIPrefabGameObject      = UnityEngine.Object.Instantiate(go);
@@ -482,8 +482,8 @@ namespace ET
             UIEventComponent.Instance.GetUIEventHandler(baseWindow.WindowID).OnInitComponent(baseWindow);
             UIEventComponent.Instance.GetUIEventHandler(baseWindow.WindowID).OnRegisterUIEvent(baseWindow);
             
-            self.AllWindowsDic[(int)baseWindow.WindowID] = baseWindow;
-            self.LoadingWindows.Remove(baseWindow.WindowID);
+            me.AllWindowsDic[(int)baseWindow.WindowID] = baseWindow;
+            me.LoadingWindows.Remove(baseWindow.WindowID);
         }
        
 

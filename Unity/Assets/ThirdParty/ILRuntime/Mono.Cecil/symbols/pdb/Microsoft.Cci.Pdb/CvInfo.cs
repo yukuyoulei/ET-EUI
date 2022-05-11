@@ -580,7 +580,7 @@ namespace Microsoft.Cci.Pdb {
     CV_PTR_BASE_ADDR=0x06, // based on address of base
     CV_PTR_BASE_SEGADDR=0x07, // based on segment address of base
     CV_PTR_BASE_TYPE=0x08, // based on type
-    CV_PTR_BASE_SELF=0x09, // based on self
+    CV_PTR_BASE_SELF=0x09, // based on me
     CV_PTR_NEAR32=0x0a, // 32 bit pointer
     CV_PTR_64=0x0c, // 64 bit pointer
     CV_PTR_UNUSEDPTR=0x0d  // first unused pointer type

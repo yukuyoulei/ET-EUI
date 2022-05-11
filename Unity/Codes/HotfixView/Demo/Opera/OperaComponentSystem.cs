@@ -6,54 +6,51 @@ namespace ET
     [ObjectSystem]
     public class OperaComponentAwakeSystem : AwakeSystem<OperaComponent>
     {
-        public override void Awake(OperaComponent self)
+        public override void Awake(OperaComponent me)
         {
-            self.mapMask = LayerMask.GetMask("Map");
+            me.mapMask = LayerMask.GetMask("Map");
         }
     }
 
     [ObjectSystem]
     public class OperaComponentUpdateSystem : UpdateSystem<OperaComponent>
     {
-        public override void Update(OperaComponent self)
+        public override void Update(OperaComponent me)
         {
-            self.Update();
+            me.Update();
         }
     }
-    
+
     [FriendClass(typeof(OperaComponent))]
     public static class OperaComponentSystem
     {
-        public static void Update(this OperaComponent self)
+        public static void Update(this OperaComponent me)
         {
             if (InputHelper.GetMouseButtonDown(1))
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
-                if (Physics.Raycast(ray, out hit, 1000, self.mapMask))
+                if (Physics.Raycast(ray, out hit, 1000, me.mapMask))
                 {
-                    self.ClickPoint = hit.point;
-                    self.frameClickMap.X = self.ClickPoint.x;
-                    self.frameClickMap.Y = self.ClickPoint.y;
-                    self.frameClickMap.Z = self.ClickPoint.z;
-                    self.ZoneScene().GetComponent<SessionComponent>().Session.Send(self.frameClickMap);
+                    me.ClickPoint = hit.point;
+                    me.frameClickMap.X = me.ClickPoint.x;
+                    me.frameClickMap.Y = me.ClickPoint.y;
+                    me.frameClickMap.Z = me.ClickPoint.z;
+                    me.ZoneScene().GetComponent<SessionComponent>().Session.Send(me.frameClickMap);
                 }
             }
 
-            // KeyCode.R
-            if (InputHelper.GetKeyDown(114))
+            // KeyCode.Escape
+            if (InputHelper.GetKeyDown(27))
             {
-                CodeLoader.Instance.LoadLogic();
-                Game.EventSystem.Add(CodeLoader.Instance.GetHotfixTypes());
-                Game.EventSystem.Load();
-                Log.Debug("hot reload success!");
+                me.ZoneScene().GetComponent<UIComponent>().ShowWindow<DlgEntityTree>();
             }
-            
+
             // KeyCode.T
             if (InputHelper.GetKeyDown(116))
             {
                 C2M_TransferMap c2MTransferMap = new C2M_TransferMap();
-                self.ZoneScene().GetComponent<SessionComponent>().Session.Call(c2MTransferMap).Coroutine();
+                me.ZoneScene().GetComponent<SessionComponent>().Session.Call(c2MTransferMap).Coroutine();
             }
         }
     }

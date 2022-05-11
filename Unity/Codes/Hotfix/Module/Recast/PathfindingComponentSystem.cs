@@ -10,12 +10,12 @@ namespace ET
         [ObjectSystem]
         public class AwakeSystem: AwakeSystem<PathfindingComponent, string>
         {
-            public override void Awake(PathfindingComponent self, string name)
+            public override void Awake(PathfindingComponent me, string name)
             {
-                self.Name = name;
-                self.NavMesh = NavmeshComponent.Instance.Get(name);
+                me.Name = name;
+                me.NavMesh = NavmeshComponent.Instance.Get(name);
 
-                if (self.NavMesh == 0)
+                if (me.NavMesh == 0)
                 {
                     throw new Exception($"nav load fail: {name}");
                 }
@@ -25,53 +25,53 @@ namespace ET
         [ObjectSystem]
         public class DestroySystem: DestroySystem<PathfindingComponent>
         {
-            public override void Destroy(PathfindingComponent self)
+            public override void Destroy(PathfindingComponent me)
             {
-                self.Name = string.Empty;
-                self.NavMesh = 0;
+                me.Name = string.Empty;
+                me.NavMesh = 0;
             }
         }
         
-        public static void Find(this PathfindingComponent self, Vector3 start, Vector3 target, List<Vector3> result)
+        public static void Find(this PathfindingComponent me, Vector3 start, Vector3 target, List<Vector3> result)
         {
-            if (self.NavMesh == 0)
+            if (me.NavMesh == 0)
             {
                 Log.Debug("寻路| Find 失败 pathfinding ptr is zero");
-                throw new Exception($"pathfinding ptr is zero: {self.DomainScene().Name}");
+                throw new Exception($"pathfinding ptr is zero: {me.DomainScene().Name}");
             }
 
-            self.StartPos[0] = -start.x;
-            self.StartPos[1] = start.y;
-            self.StartPos[2] = start.z;
+            me.StartPos[0] = -start.x;
+            me.StartPos[1] = start.y;
+            me.StartPos[2] = start.z;
 
-            self.EndPos[0] = -target.x;
-            self.EndPos[1] = target.y;
-            self.EndPos[2] = target.z;
-            //Log.Debug($"start find path: {self.GetParent<Unit>().Id}");
-            int n = Recast.RecastFind(self.NavMesh, PathfindingComponent.extents, self.StartPos, self.EndPos, self.Result);
+            me.EndPos[0] = -target.x;
+            me.EndPos[1] = target.y;
+            me.EndPos[2] = target.z;
+            //Log.Debug($"start find path: {me.GetParent<Unit>().Id}");
+            int n = Recast.RecastFind(me.NavMesh, PathfindingComponent.extents, me.StartPos, me.EndPos, me.Result);
             for (int i = 0; i < n; ++i)
             {
                 int index = i * 3;
-                result.Add(new Vector3(-self.Result[index], self.Result[index + 1], self.Result[index + 2]));
+                result.Add(new Vector3(-me.Result[index], me.Result[index + 1], me.Result[index + 2]));
             }
-            //Log.Debug($"finish find path: {self.GetParent<Unit>().Id} {result.ListToString()}");
+            //Log.Debug($"finish find path: {me.GetParent<Unit>().Id} {result.ListToString()}");
         }
 
-        public static void FindWithAdjust(this PathfindingComponent self, Vector3 start, Vector3 target, List<Vector3> result,float adjustRaduis)
+        public static void FindWithAdjust(this PathfindingComponent me, Vector3 start, Vector3 target, List<Vector3> result,float adjustRaduis)
         {
-            self.Find(start, target, result);
+            me.Find(start, target, result);
             for (int i = 0; i < result.Count; i++)
             {
-                Vector3 adjust = self.FindRandomPointWithRaduis(result[i], adjustRaduis);
+                Vector3 adjust = me.FindRandomPointWithRaduis(result[i], adjustRaduis);
                 result[i] = adjust;
             }
         }
         
-        public static Vector3 FindRandomPointWithRaduis(this PathfindingComponent self, Vector3 pos, float raduis)
+        public static Vector3 FindRandomPointWithRaduis(this PathfindingComponent me, Vector3 pos, float raduis)
         {
-            if (self.NavMesh == 0)
+            if (me.NavMesh == 0)
             {
-                throw new Exception($"pathfinding ptr is zero: {self.DomainScene().Name}");
+                throw new Exception($"pathfinding ptr is zero: {me.DomainScene().Name}");
             }
 
             if (raduis > PathfindingComponent.FindRandomNavPosMaxRadius * 0.001f)
@@ -87,23 +87,23 @@ namespace ET
 
             Vector3 findpos = new Vector3(pos.x + x, pos.y, pos.z + z);
 
-            return self.RecastFindNearestPoint(findpos);
+            return me.RecastFindNearestPoint(findpos);
         }
         
         /// <summary>
         /// 以pos为中心各自在宽和高的左右 前后两个方向延伸
         /// </summary>
-        /// <param name="self"></param>
+        /// <param name="me"></param>
         /// <param name="pos"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static Vector3 FindRandomPointWithRectangle(this PathfindingComponent self, Vector3 pos, int width, int height)
+        public static Vector3 FindRandomPointWithRectangle(this PathfindingComponent me, Vector3 pos, int width, int height)
         {
-            if (self.NavMesh == 0)
+            if (me.NavMesh == 0)
             {
-                throw new Exception($"pathfinding ptr is zero: {self.DomainScene().Name}");
+                throw new Exception($"pathfinding ptr is zero: {me.DomainScene().Name}");
             }
 
             if (width > PathfindingComponent.FindRandomNavPosMaxRadius * 0.001f || height > PathfindingComponent.FindRandomNavPosMaxRadius * 0.001f)
@@ -116,14 +116,14 @@ namespace ET
 
             Vector3 findpos = new Vector3(pos.x + x, pos.y, pos.z + z);
 
-            return self.RecastFindNearestPoint(findpos);
+            return me.RecastFindNearestPoint(findpos);
         }
         
-        public static Vector3 FindRandomPointWithRaduis(this PathfindingComponent self, Vector3 pos, float minRadius, float maxRadius)
+        public static Vector3 FindRandomPointWithRaduis(this PathfindingComponent me, Vector3 pos, float minRadius, float maxRadius)
         {
-            if (self.NavMesh == 0)
+            if (me.NavMesh == 0)
             {
-                throw new Exception($"pathfinding ptr is zero: {self.DomainScene().Name}");
+                throw new Exception($"pathfinding ptr is zero: {me.DomainScene().Name}");
             }
 
             if (maxRadius > PathfindingComponent.FindRandomNavPosMaxRadius * 0.001f)
@@ -139,27 +139,27 @@ namespace ET
 
             Vector3 findpos = new Vector3(pos.x + x, pos.y, pos.z + z);
 
-            return self.RecastFindNearestPoint(findpos);
+            return me.RecastFindNearestPoint(findpos);
         }
 
-        public static Vector3 RecastFindNearestPoint(this PathfindingComponent self, Vector3 pos)
+        public static Vector3 RecastFindNearestPoint(this PathfindingComponent me, Vector3 pos)
         {
-            if (self.NavMesh == 0)
+            if (me.NavMesh == 0)
             {
-                throw new Exception($"pathfinding ptr is zero: {self.DomainScene().Name}");
+                throw new Exception($"pathfinding ptr is zero: {me.DomainScene().Name}");
             }
 
-            self.StartPos[0] = -pos.x;
-            self.StartPos[1] = pos.y;
-            self.StartPos[2] = pos.z;
+            me.StartPos[0] = -pos.x;
+            me.StartPos[1] = pos.y;
+            me.StartPos[2] = pos.z;
 
-            int ret = Recast.RecastFindNearestPoint(self.NavMesh, PathfindingComponent.extents, self.StartPos, self.EndPos);
+            int ret = Recast.RecastFindNearestPoint(me.NavMesh, PathfindingComponent.extents, me.StartPos, me.EndPos);
             if (ret == 0)
             {
-                throw new Exception($"RecastFindNearestPoint fail, 可能是位置配置有问题: sceneName:{self.DomainScene().Name} {pos} {self.Name} {self.GetParent<Unit>().Id} {self.GetParent<Unit>().Config.Id} {self.EndPos.ArrayToString()}");
+                throw new Exception($"RecastFindNearestPoint fail, 可能是位置配置有问题: sceneName:{me.DomainScene().Name} {pos} {me.Name} {me.GetParent<Unit>().Id} {me.GetParent<Unit>().Config.Id} {me.EndPos.ArrayToString()}");
             }
             
-            return new Vector3(-self.EndPos[0], self.EndPos[1], self.EndPos[2]);
+            return new Vector3(-me.EndPos[0], me.EndPos[1], me.EndPos[2]);
         }
     }
 }

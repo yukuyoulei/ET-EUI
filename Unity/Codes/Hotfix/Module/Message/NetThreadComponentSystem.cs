@@ -6,31 +6,31 @@ namespace ET
     [ObjectSystem]
     public class NetThreadComponentAwakeSystem: AwakeSystem<NetThreadComponent>
     {
-        public override void Awake(NetThreadComponent self)
+        public override void Awake(NetThreadComponent me)
         {
-            NetThreadComponent.Instance = self;
+            NetThreadComponent.Instance = me;
             
-            self.ThreadSynchronizationContext = ThreadSynchronizationContext.Instance;
+            me.ThreadSynchronizationContext = ThreadSynchronizationContext.Instance;
 
-            self.foreachAction = service => service.Update();
+            me.foreachAction = service => service.Update();
         }
     }
 
     [ObjectSystem]
     public class NetThreadComponentUpdateSystem: LateUpdateSystem<NetThreadComponent>
     {
-        public override void LateUpdate(NetThreadComponent self)
+        public override void LateUpdate(NetThreadComponent me)
         {
-            self.Services.Foreach(self.foreachAction);
+            me.Services.Foreach(me.foreachAction);
         }
     }
     
     [ObjectSystem]
     public class NetThreadComponentDestroySystem: DestroySystem<NetThreadComponent>
     {
-        public override void Destroy(NetThreadComponent self)
+        public override void Destroy(NetThreadComponent me)
         {
-            self.Stop();
+            me.Stop();
         }
     }
     
@@ -38,33 +38,33 @@ namespace ET
     public static class NetThreadComponentSystem
     {
 
-        public static void Stop(this NetThreadComponent self)
+        public static void Stop(this NetThreadComponent me)
         {
         }
 
-        public static void Add(this NetThreadComponent self, AService kService)
+        public static void Add(this NetThreadComponent me, AService kService)
         {
             // 这里要去下一帧添加，避免foreach错误
-            self.ThreadSynchronizationContext.PostNext(() =>
+            me.ThreadSynchronizationContext.PostNext(() =>
             {
                 if (kService.IsDispose())
                 {
                     return;
                 }
-                self.Services.Add(kService);
+                me.Services.Add(kService);
             });
         }
         
-        public static void Remove(this NetThreadComponent self, AService kService)
+        public static void Remove(this NetThreadComponent me, AService kService)
         {
             // 这里要去下一帧删除，避免foreach错误
-            self.ThreadSynchronizationContext.PostNext(() =>
+            me.ThreadSynchronizationContext.PostNext(() =>
             {
                 if (kService.IsDispose())
                 {
                     return;
                 }
-                self.Services.Remove(kService);
+                me.Services.Remove(kService);
             });
         }
         

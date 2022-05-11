@@ -292,9 +292,9 @@ namespace ILRuntime.Mono.Cecil {
 
 	static partial class Mixin {
 
-		public static bool IsPrimitive (this ElementType self)
+		public static bool IsPrimitive (this ElementType me)
 		{
-			switch (self) {
+			switch (me) {
 			case ElementType.Boolean:
 			case ElementType.Char:
 			case ElementType.I:
@@ -315,17 +315,17 @@ namespace ILRuntime.Mono.Cecil {
 			}
 		}
 
-		public static string TypeFullName (this TypeReference self)
+		public static string TypeFullName (this TypeReference me)
 		{
-			return string.IsNullOrEmpty (self.Namespace)
-				? self.Name
-				: self.Namespace + '.' + self.Name;
+			return string.IsNullOrEmpty (me.Namespace)
+				? me.Name
+				: me.Namespace + '.' + me.Name;
 		}
 
-		public static bool IsTypeOf (this TypeReference self, string @namespace, string name)
+		public static bool IsTypeOf (this TypeReference me, string @namespace, string name)
 		{
-			return self.Name == name
-				&& self.Namespace == @namespace;
+			return me.Name == name
+				&& me.Namespace == @namespace;
 		}
 
 		public static bool IsTypeSpecification (this TypeReference type)
@@ -349,11 +349,11 @@ namespace ILRuntime.Mono.Cecil {
 			return false;
 		}
 
-		public static TypeDefinition CheckedResolve (this TypeReference self)
+		public static TypeDefinition CheckedResolve (this TypeReference me)
 		{
-			var type = self.Resolve ();
+			var type = me.Resolve ();
 			if (type == null)
-				throw new ResolutionException (self);
+				throw new ResolutionException (me);
 
 			return type;
 		}

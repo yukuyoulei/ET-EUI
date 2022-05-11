@@ -9,25 +9,25 @@ namespace ET
         [ObjectSystem]
         public class NumericWatcherComponentAwakeSystem : AwakeSystem<NumericWatcherComponent>
         {
-            public override void Awake(NumericWatcherComponent self)
+            public override void Awake(NumericWatcherComponent me)
             {
-                NumericWatcherComponent.Instance = self;
-                self.Init();
+                NumericWatcherComponent.Instance = me;
+                me.Init();
             }
         }
 
 	
         public class NumericWatcherComponentLoadSystem : LoadSystem<NumericWatcherComponent>
         {
-            public override void Load(NumericWatcherComponent self)
+            public override void Load(NumericWatcherComponent me)
             {
-                self.Init();
+                me.Init();
             }
         }
 
-        private static void Init(this NumericWatcherComponent self)
+        private static void Init(this NumericWatcherComponent me)
         {
-            self.allWatchers = new Dictionary<int, List<INumericWatcher>>();
+            me.allWatchers = new Dictionary<int, List<INumericWatcher>>();
 
             List<Type> types = Game.EventSystem.GetTypes(typeof(NumericWatcherAttribute));
             foreach (Type type in types)
@@ -38,19 +38,19 @@ namespace ET
                 {
                     NumericWatcherAttribute numericWatcherAttribute = (NumericWatcherAttribute)attr;
                     INumericWatcher obj = (INumericWatcher)Activator.CreateInstance(type);
-                    if (!self.allWatchers.ContainsKey(numericWatcherAttribute.NumericType))
+                    if (!me.allWatchers.ContainsKey(numericWatcherAttribute.NumericType))
                     {
-                        self.allWatchers.Add(numericWatcherAttribute.NumericType, new List<INumericWatcher>());
+                        me.allWatchers.Add(numericWatcherAttribute.NumericType, new List<INumericWatcher>());
                     }
-                    self.allWatchers[numericWatcherAttribute.NumericType].Add(obj);
+                    me.allWatchers[numericWatcherAttribute.NumericType].Add(obj);
                 }
             }
         }
 
-        public static void Run(this NumericWatcherComponent self, EventType.NumbericChange args)
+        public static void Run(this NumericWatcherComponent me, EventType.NumbericChange args)
         {
             List<INumericWatcher> list;
-            if (!self.allWatchers.TryGetValue(args.NumericType, out list))
+            if (!me.allWatchers.TryGetValue(args.NumericType, out list))
             {
                 return;
             }

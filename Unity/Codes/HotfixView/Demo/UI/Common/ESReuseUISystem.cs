@@ -2,9 +2,9 @@
 {
     public static class ESReuseUISystem
     {
-        public static void TestFunction(this ESReuseUI self,string content)
+        public static void TestFunction(this ESReuseUI me,string content)
         {
-            self.ELabel_testText.text = content;
+            me.ELabel_testText.text = content;
         }
     }
 }

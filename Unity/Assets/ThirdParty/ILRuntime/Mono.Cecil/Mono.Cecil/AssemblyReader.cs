@@ -1138,7 +1138,7 @@ namespace ILRuntime.Mono.Cecil {
 					scope = declaring_type != null
 						? declaring_type.Scope
 						: module;
-				} else // obfuscated typeref row pointing to self
+				} else // obfuscated typeref row pointing to me
 					scope = module;
 			} else
 				scope = GetTypeReferenceScope (scope_token);

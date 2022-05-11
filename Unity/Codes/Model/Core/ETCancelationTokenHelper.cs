@@ -2,21 +2,21 @@ namespace ET
 {
     public static class ETCancelationTokenHelper
     {
-        public static async ETTask CancelAfter(this ETCancellationToken self, long afterTimeCancel)
+        public static async ETTask CancelAfter(this ETCancellationToken me, long afterTimeCancel)
         {
-            if (self.IsCancel())
+            if (me.IsCancel())
             {
                 return;
             }
 
             await TimerComponent.Instance.WaitAsync(afterTimeCancel);
             
-            if (self.IsCancel())
+            if (me.IsCancel())
             {
                 return;
             }
             
-            self.Cancel();
+            me.Cancel();
         }
     }
 }
