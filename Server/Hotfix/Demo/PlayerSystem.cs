@@ -6,9 +6,9 @@
         [ObjectSystem]
         public class PlayerAwakeSystem : AwakeSystem<Player, string>
         {
-            public override void Awake(Player self, string a)
+            public override void Awake(Player me, string a)
             {
-                self.Account = a;
+                me.Account = a;
             }
         }
     }

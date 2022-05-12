@@ -7,17 +7,17 @@ namespace ET
 	{
 		public class SessionPlayerComponentDestroySystem: DestroySystem<SessionPlayerComponent>
 		{
-			public override void Destroy(SessionPlayerComponent self)
+			public override void Destroy(SessionPlayerComponent me)
 			{
 				// 发送断线消息
-				ActorLocationSenderComponent.Instance.Send(self.PlayerId, new G2M_SessionDisconnect());
-				self.Domain.GetComponent<PlayerComponent>()?.Remove(self.PlayerId);
+				ActorLocationSenderComponent.Instance.Send(me.PlayerId, new G2M_SessionDisconnect());
+				me.Domain.GetComponent<PlayerComponent>()?.Remove(me.PlayerId);
 			}
 		}
 
-		public static Player GetMyPlayer(this SessionPlayerComponent self)
+		public static Player GetMyPlayer(this SessionPlayerComponent me)
 		{
-			return self.Domain.GetComponent<PlayerComponent>().Get(self.PlayerId);
+			return me.Domain.GetComponent<PlayerComponent>().Get(me.PlayerId);
 		}
 	}
 }

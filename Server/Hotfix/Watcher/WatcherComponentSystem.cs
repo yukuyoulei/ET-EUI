@@ -5,15 +5,15 @@ namespace ET
 {
     public class WatcherComponentAwakeSystem: AwakeSystem<WatcherComponent>
     {
-        public override void Awake(WatcherComponent self)
+        public override void Awake(WatcherComponent me)
         {
-            WatcherComponent.Instance = self;
+            WatcherComponent.Instance = me;
         }
     }
     
     public class WatcherComponentDestroySystem: DestroySystem<WatcherComponent>
     {
-        public override void Destroy(WatcherComponent self)
+        public override void Destroy(WatcherComponent me)
         {
             WatcherComponent.Instance = null;
         }
@@ -22,7 +22,7 @@ namespace ET
     [FriendClass(typeof(WatcherComponent))]
     public static class WatcherComponentSystem
     {
-        public static void Start(this WatcherComponent self, int createScenes = 0)
+        public static void Start(this WatcherComponent me, int createScenes = 0)
         {
             string[] localIP = NetworkHelper.GetAddressIPs();
             var processConfigs = StartProcessConfigCategory.Instance.GetAll();
@@ -33,7 +33,7 @@ namespace ET
                     continue;
                 }
                 Process process = WatcherHelper.StartProcess(startProcessConfig.Id, createScenes);
-                self.Processes.Add(startProcessConfig.Id, process);
+                me.Processes.Add(startProcessConfig.Id, process);
             }
         }
     }

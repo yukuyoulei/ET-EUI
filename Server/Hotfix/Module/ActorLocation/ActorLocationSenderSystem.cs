@@ -5,23 +5,23 @@ namespace ET
     [ObjectSystem]
     public class ActorLocationSenderAwakeSystem: AwakeSystem<ActorLocationSender>
     {
-        public override void Awake(ActorLocationSender self)
+        public override void Awake(ActorLocationSender me)
         {
-            self.LastSendOrRecvTime = TimeHelper.ServerNow();
-            self.ActorId = 0;
-            self.Error = 0;
+            me.LastSendOrRecvTime = TimeHelper.ServerNow();
+            me.ActorId = 0;
+            me.Error = 0;
         }
     }
 
     [ObjectSystem]
     public class ActorLocationSenderDestroySystem: DestroySystem<ActorLocationSender>
     {
-        public override void Destroy(ActorLocationSender self)
+        public override void Destroy(ActorLocationSender me)
         {
-            Log.Debug($"actor location remove: {self.Id}");
-            self.LastSendOrRecvTime = 0;
-            self.ActorId = 0;
-            self.Error = 0;
+            Log.Debug($"actor location remove: {me.Id}");
+            me.LastSendOrRecvTime = 0;
+            me.ActorId = 0;
+            me.Error = 0;
         }
     }
 }

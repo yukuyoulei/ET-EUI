@@ -46,6 +46,16 @@ namespace ET
                 me.ZoneScene().GetComponent<UIComponent>().ShowWindow<DlgEntityTree>();
             }
 
+            // KeyCode.R
+            if (InputHelper.GetKeyDown(114))
+            {
+                CodeLoader.Instance.CodeMode = CodeMode.Reload;
+                CodeLoader.Instance.LoadLogic();
+                Game.EventSystem.Add(CodeLoader.Instance.GetHotfixTypes());
+                Game.EventSystem.Load();
+                Log.Debug("hot reload success!");
+            }
+
             // KeyCode.T
             if (InputHelper.GetKeyDown(116))
             {

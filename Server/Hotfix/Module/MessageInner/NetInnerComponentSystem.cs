@@ -10,16 +10,16 @@ namespace ET
     [ObjectSystem]
     public class NetInnerComponentAwakeSystem: AwakeSystem<NetInnerComponent, int>
     {
-        public override void Awake(NetInnerComponent self, int sessionStreamDispatcherType)
+        public override void Awake(NetInnerComponent me, int sessionStreamDispatcherType)
         {
-            NetInnerComponent.Instance = self;
-            self.SessionStreamDispatcherType = sessionStreamDispatcherType;
+            NetInnerComponent.Instance = me;
+            me.SessionStreamDispatcherType = sessionStreamDispatcherType;
             
-            self.Service = new TService(NetThreadComponent.Instance.ThreadSynchronizationContext, ServiceType.Inner);
-            self.Service.ErrorCallback += self.OnError;
-            self.Service.ReadCallback += self.OnRead;
+            me.Service = new TService(NetThreadComponent.Instance.ThreadSynchronizationContext, ServiceType.Inner);
+            me.Service.ErrorCallback += me.OnError;
+            me.Service.ReadCallback += me.OnRead;
 
-            NetThreadComponent.Instance.Add(self.Service);
+            NetThreadComponent.Instance.Add(me.Service);
         }
     }
 
@@ -27,48 +27,48 @@ namespace ET
     [ObjectSystem]
     public class NetInnerComponentAwake1System: AwakeSystem<NetInnerComponent, IPEndPoint, int>
     {
-        public override void Awake(NetInnerComponent self, IPEndPoint address, int sessionStreamDispatcherType)
+        public override void Awake(NetInnerComponent me, IPEndPoint address, int sessionStreamDispatcherType)
         {
-            NetInnerComponent.Instance = self;
-            self.SessionStreamDispatcherType = sessionStreamDispatcherType;
+            NetInnerComponent.Instance = me;
+            me.SessionStreamDispatcherType = sessionStreamDispatcherType;
 
-            self.Service = new TService(NetThreadComponent.Instance.ThreadSynchronizationContext, address, ServiceType.Inner);
-            self.Service.ErrorCallback += self.OnError;
-            self.Service.ReadCallback += self.OnRead;
-            self.Service.AcceptCallback += self.OnAccept;
+            me.Service = new TService(NetThreadComponent.Instance.ThreadSynchronizationContext, address, ServiceType.Inner);
+            me.Service.ErrorCallback += me.OnError;
+            me.Service.ReadCallback += me.OnRead;
+            me.Service.AcceptCallback += me.OnAccept;
 
-            NetThreadComponent.Instance.Add(self.Service);
+            NetThreadComponent.Instance.Add(me.Service);
         }
     }
 
     [ObjectSystem]
     public class NetInnerComponentDestroySystem: DestroySystem<NetInnerComponent>
     {
-        public override void Destroy(NetInnerComponent self)
+        public override void Destroy(NetInnerComponent me)
         {
-            NetThreadComponent.Instance.Remove(self.Service);
-            self.Service.Destroy();
+            NetThreadComponent.Instance.Remove(me.Service);
+            me.Service.Destroy();
         }
     }
 
     [FriendClass(typeof(NetInnerComponent))]
     public static class NetInnerComponentSystem
     {
-        public static void OnRead(this NetInnerComponent self, long channelId, MemoryStream memoryStream)
+        public static void OnRead(this NetInnerComponent me, long channelId, MemoryStream memoryStream)
         {
-            Session session = self.GetChild<Session>(channelId);
+            Session session = me.GetChild<Session>(channelId);
             if (session == null)
             {
                 return;
             }
 
             session.LastRecvTime = TimeHelper.ClientNow();
-            SessionStreamDispatcher.Instance.Dispatch(self.SessionStreamDispatcherType, session, memoryStream);
+            SessionStreamDispatcher.Instance.Dispatch(me.SessionStreamDispatcherType, session, memoryStream);
         }
 
-        public static void OnError(this NetInnerComponent self, long channelId, int error)
+        public static void OnError(this NetInnerComponent me, long channelId, int error)
         {
-            Session session = self.GetChild<Session>(channelId);
+            Session session = me.GetChild<Session>(channelId);
             if (session == null)
             {
                 return;
@@ -79,29 +79,29 @@ namespace ET
         }
 
         // 这个channelId是由CreateAcceptChannelId生成的
-        public static void OnAccept(this NetInnerComponent self, long channelId, IPEndPoint ipEndPoint)
+        public static void OnAccept(this NetInnerComponent me, long channelId, IPEndPoint ipEndPoint)
         {
-            Session session = self.AddChildWithId<Session, AService>(channelId, self.Service);
+            Session session = me.AddChildWithId<Session, AService>(channelId, me.Service);
             session.RemoteAddress = ipEndPoint;
             //session.AddComponent<SessionIdleCheckerComponent, int, int, int>(NetThreadComponent.checkInteral, NetThreadComponent.recvMaxIdleTime, NetThreadComponent.sendMaxIdleTime);
         }
 
         // 这个channelId是由CreateConnectChannelId生成的
-        public static Session Create(this NetInnerComponent self, IPEndPoint ipEndPoint)
+        public static Session Create(this NetInnerComponent me, IPEndPoint ipEndPoint)
         {
-            uint localConn = self.Service.CreateRandomLocalConn();
-            long channelId = self.Service.CreateConnectChannelId(localConn);
-            Session session = self.CreateInner(channelId, ipEndPoint);
+            uint localConn = me.Service.CreateRandomLocalConn();
+            long channelId = me.Service.CreateConnectChannelId(localConn);
+            Session session = me.CreateInner(channelId, ipEndPoint);
             return session;
         }
 
-        private static Session CreateInner(this NetInnerComponent self, long channelId, IPEndPoint ipEndPoint)
+        private static Session CreateInner(this NetInnerComponent me, long channelId, IPEndPoint ipEndPoint)
         {
-            Session session = self.AddChildWithId<Session, AService>(channelId, self.Service);
+            Session session = me.AddChildWithId<Session, AService>(channelId, me.Service);
 
             session.RemoteAddress = ipEndPoint;
 
-            self.Service.GetOrCreate(channelId, ipEndPoint);
+            me.Service.GetOrCreate(channelId, ipEndPoint);
 
             //session.AddComponent<InnerPingComponent>();
             //session.AddComponent<SessionIdleCheckerComponent, int, int, int>(NetThreadComponent.checkInteral, NetThreadComponent.recvMaxIdleTime, NetThreadComponent.sendMaxIdleTime);
@@ -110,13 +110,13 @@ namespace ET
         }
 
         // 内网actor session，channelId是进程号
-        public static Session Get(this NetInnerComponent self, long channelId)
+        public static Session Get(this NetInnerComponent me, long channelId)
         {
-            Session session = self.GetChild<Session>(channelId);
+            Session session = me.GetChild<Session>(channelId);
             if (session == null)
             {
                 IPEndPoint ipEndPoint = StartProcessConfigCategory.Instance.Get((int) channelId).InnerIPPort;
-                session = self.CreateInner(channelId, ipEndPoint);
+                session = me.CreateInner(channelId, ipEndPoint);
             }
 
             return session;

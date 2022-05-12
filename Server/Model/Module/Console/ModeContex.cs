@@ -3,18 +3,18 @@
     [ObjectSystem]
     public class ModeContexAwakeSystem: AwakeSystem<ModeContex>
     {
-        public override void Awake(ModeContex self)
+        public override void Awake(ModeContex me)
         {
-            self.Mode = "";
+            me.Mode = "";
         }
     }
 
     [ObjectSystem]
     public class ModeContexDestroySystem: DestroySystem<ModeContex>
     {
-        public override void Destroy(ModeContex self)
+        public override void Destroy(ModeContex me)
         {
-            self.Mode = "";
+            me.Mode = "";
         }
     }
 

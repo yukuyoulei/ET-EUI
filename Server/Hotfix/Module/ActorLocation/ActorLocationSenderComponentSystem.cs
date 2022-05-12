@@ -6,15 +6,15 @@ namespace ET
     [Timer(TimerType.ActorLocationSenderChecker)]
     public class ActorLocationSenderChecker: ATimer<ActorLocationSenderComponent>
     {
-        public override void Run(ActorLocationSenderComponent self)
+        public override void Run(ActorLocationSenderComponent me)
         {
             try
             {
-                self.Check();
+                me.Check();
             }
             catch (Exception e)
             {
-                Log.Error($"move timer error: {self.Id}\n{e}");
+                Log.Error($"move timer error: {me.Id}\n{e}");
             }
         }
     }
@@ -22,23 +22,23 @@ namespace ET
     [ObjectSystem]
     public class ActorLocationSenderComponentAwakeSystem: AwakeSystem<ActorLocationSenderComponent>
     {
-        public override void Awake(ActorLocationSenderComponent self)
+        public override void Awake(ActorLocationSenderComponent me)
         {
-            ActorLocationSenderComponent.Instance = self;
+            ActorLocationSenderComponent.Instance = me;
 
             // 每10s扫描一次过期的actorproxy进行回收,过期时间是2分钟
             // 可能由于bug或者进程挂掉，导致ActorLocationSender发送的消息没有确认，结果无法自动删除，每一分钟清理一次这种ActorLocationSender
-            self.CheckTimer = TimerComponent.Instance.NewRepeatedTimer(10 * 1000, TimerType.ActorLocationSenderChecker, self);
+            me.CheckTimer = TimerComponent.Instance.NewRepeatedTimer(10 * 1000, TimerType.ActorLocationSenderChecker, me);
         }
     }
 
     [ObjectSystem]
     public class ActorLocationSenderComponentDestroySystem: DestroySystem<ActorLocationSenderComponent>
     {
-        public override void Destroy(ActorLocationSenderComponent self)
+        public override void Destroy(ActorLocationSenderComponent me)
         {
             ActorLocationSenderComponent.Instance = null;
-            TimerComponent.Instance.Remove(ref self.CheckTimer);
+            TimerComponent.Instance.Remove(ref me.CheckTimer);
         }
     }
 
@@ -46,12 +46,12 @@ namespace ET
     [FriendClass(typeof(ActorLocationSender))]
     public static class ActorLocationSenderComponentSystem
     {
-        public static void Check(this ActorLocationSenderComponent self)
+        public static void Check(this ActorLocationSenderComponent me)
         {
             using (ListComponent<long> list = ListComponent<long>.Create())
             {
                 long timeNow = TimeHelper.ServerNow();
-                foreach ((long key, Entity value) in self.Children)
+                foreach ((long key, Entity value) in me.Children)
                 {
                     ActorLocationSender actorLocationMessageSender = (ActorLocationSender) value;
 
@@ -63,30 +63,30 @@ namespace ET
 
                 foreach (long id in list)
                 {
-                    self.Remove(id);
+                    me.Remove(id);
                 }
             }
         }
 
-        private static ActorLocationSender GetOrCreate(this ActorLocationSenderComponent self, long id)
+        private static ActorLocationSender GetOrCreate(this ActorLocationSenderComponent me, long id)
         {
             if (id == 0)
             {
                 throw new Exception($"actor id is 0");
             }
 
-            if (self.Children.TryGetValue(id, out Entity actorLocationSender))
+            if (me.Children.TryGetValue(id, out Entity actorLocationSender))
             {
                 return (ActorLocationSender) actorLocationSender;
             }
 
-            actorLocationSender = self.AddChildWithId<ActorLocationSender>(id);
+            actorLocationSender = me.AddChildWithId<ActorLocationSender>(id);
             return (ActorLocationSender) actorLocationSender;
         }
 
-        private static void Remove(this ActorLocationSenderComponent self, long id)
+        private static void Remove(this ActorLocationSenderComponent me, long id)
         {
-            if (!self.Children.TryGetValue(id, out Entity actorMessageSender))
+            if (!me.Children.TryGetValue(id, out Entity actorMessageSender))
             {
                 return;
             }
@@ -94,14 +94,14 @@ namespace ET
             actorMessageSender.Dispose();
         }
 
-        public static void Send(this ActorLocationSenderComponent self, long entityId, IActorRequest message)
+        public static void Send(this ActorLocationSenderComponent me, long entityId, IActorRequest message)
         {
-            self.Call(entityId, message).Coroutine();
+            me.Call(entityId, message).Coroutine();
         }
 
-        public static async ETTask<IActorResponse> Call(this ActorLocationSenderComponent self, long entityId, IActorRequest iActorRequest)
+        public static async ETTask<IActorResponse> Call(this ActorLocationSenderComponent me, long entityId, IActorRequest iActorRequest)
         {
-            ActorLocationSender actorLocationSender = self.GetOrCreate(entityId);
+            ActorLocationSender actorLocationSender = me.GetOrCreate(entityId);
 
             // 先序列化好
             int rpcId = ActorMessageSenderComponent.Instance.GetRpcId();
@@ -124,22 +124,22 @@ namespace ET
                 
                 try
                 {
-                    return await self.CallInner(actorLocationSender, rpcId, stream);
+                    return await me.CallInner(actorLocationSender, rpcId, stream);
                 }
                 catch (RpcException)
                 {
-                    self.Remove(actorLocationSender.Id);
+                    me.Remove(actorLocationSender.Id);
                     throw;
                 }
                 catch (Exception e)
                 {
-                    self.Remove(actorLocationSender.Id);
+                    me.Remove(actorLocationSender.Id);
                     throw new Exception($"{stream.ToActorMessage()}", e);
                 }
             }
         }
 
-        private static async ETTask<IActorResponse> CallInner(this ActorLocationSenderComponent self, ActorLocationSender actorLocationSender, int rpcId, MemoryStream memoryStream)
+        private static async ETTask<IActorResponse> CallInner(this ActorLocationSenderComponent me, ActorLocationSender actorLocationSender, int rpcId, MemoryStream memoryStream)
         {
             int failTimes = 0;
             long instanceId = actorLocationSender.InstanceId;

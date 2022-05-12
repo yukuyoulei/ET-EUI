@@ -10,58 +10,58 @@ namespace ET
     {
 	    public class DBComponentAwakeSystem : AwakeSystem<DBComponent, string, string, int>
 	    {
-		    public override void Awake(DBComponent self, string dbConnection, string dbName, int zone)
+		    public override void Awake(DBComponent me, string dbConnection, string dbName, int zone)
 		    {
-			    self.mongoClient = new MongoClient(dbConnection);
-			    self.database = self.mongoClient.GetDatabase(dbName);
+			    me.mongoClient = new MongoClient(dbConnection);
+			    me.database = me.mongoClient.GetDatabase(dbName);
 		    }
 	    }
 
-	    private static IMongoCollection<T> GetCollection<T>(this DBComponent self, string collection = null)
+	    private static IMongoCollection<T> GetCollection<T>(this DBComponent me, string collection = null)
 	    {
-		    return self.database.GetCollection<T>(collection ?? typeof (T).Name);
+		    return me.database.GetCollection<T>(collection ?? typeof (T).Name);
 	    }
 
-	    private static IMongoCollection<Entity> GetCollection(this DBComponent self, string name)
+	    private static IMongoCollection<Entity> GetCollection(this DBComponent me, string name)
 	    {
-		    return self.database.GetCollection<Entity>(name);
+		    return me.database.GetCollection<Entity>(name);
 	    }
 	    
 	    #region Query
 
-	    public static async ETTask<T> Query<T>(this DBComponent self, long id, string collection = null) where T : Entity
+	    public static async ETTask<T> Query<T>(this DBComponent me, long id, string collection = null) where T : Entity
 	    {
 		    using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.DB, id % DBComponent.TaskCount))
 		    {
-			    IAsyncCursor<T> cursor = await self.GetCollection<T>(collection).FindAsync(d => d.Id == id);
+			    IAsyncCursor<T> cursor = await me.GetCollection<T>(collection).FindAsync(d => d.Id == id);
 
 			    return await cursor.FirstOrDefaultAsync();
 		    }
 	    }
 	    
-	    public static async ETTask<List<T>> Query<T>(this DBComponent self, Expression<Func<T, bool>> filter, string collection = null)
+	    public static async ETTask<List<T>> Query<T>(this DBComponent me, Expression<Func<T, bool>> filter, string collection = null)
 			    where T : Entity
 	    {
 		    using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.DB, RandomHelper.RandInt64() % DBComponent.TaskCount))
 		    {
-			    IAsyncCursor<T> cursor = await self.GetCollection<T>(collection).FindAsync(filter);
+			    IAsyncCursor<T> cursor = await me.GetCollection<T>(collection).FindAsync(filter);
 
 			    return await cursor.ToListAsync();
 		    }
 	    }
 
-	    public static async ETTask<List<T>> Query<T>(this DBComponent self, long taskId, Expression<Func<T, bool>> filter, string collection = null)
+	    public static async ETTask<List<T>> Query<T>(this DBComponent me, long taskId, Expression<Func<T, bool>> filter, string collection = null)
 			    where T : Entity
 	    {
 		    using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.DB, taskId % DBComponent.TaskCount))
 		    {
-			    IAsyncCursor<T> cursor = await self.GetCollection<T>(collection).FindAsync(filter);
+			    IAsyncCursor<T> cursor = await me.GetCollection<T>(collection).FindAsync(filter);
 
 			    return await cursor.ToListAsync();
 		    }
 	    }
 	    
-	    public static async ETTask Query(this DBComponent self, long id, List<string> collectionNames, List<Entity> result)
+	    public static async ETTask Query(this DBComponent me, long id, List<string> collectionNames, List<Entity> result)
 	    {
 		    if (collectionNames == null || collectionNames.Count == 0)
 		    {
@@ -72,7 +72,7 @@ namespace ET
 		    {
 			    foreach (string collectionName in collectionNames)
 			    {
-				    IAsyncCursor<Entity> cursor = await self.GetCollection(collectionName).FindAsync(d => d.Id == id);
+				    IAsyncCursor<Entity> cursor = await me.GetCollection(collectionName).FindAsync(d => d.Id == id);
 
 				    Entity e = await cursor.FirstOrDefaultAsync();
 
@@ -86,22 +86,22 @@ namespace ET
 		    }
 	    }
 
-	    public static async ETTask<List<T>> QueryJson<T>(this DBComponent self, string json, string collection = null) where T : Entity
+	    public static async ETTask<List<T>> QueryJson<T>(this DBComponent me, string json, string collection = null) where T : Entity
 	    {
 		    using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.DB, RandomHelper.RandInt64() % DBComponent.TaskCount))
 		    {
 			    FilterDefinition<T> filterDefinition = new JsonFilterDefinition<T>(json);
-			    IAsyncCursor<T> cursor = await self.GetCollection<T>(collection).FindAsync(filterDefinition);
+			    IAsyncCursor<T> cursor = await me.GetCollection<T>(collection).FindAsync(filterDefinition);
 			    return await cursor.ToListAsync();
 		    }
 	    }
 
-	    public static async ETTask<List<T>> QueryJson<T>(this DBComponent self, long taskId, string json, string collection = null) where T : Entity
+	    public static async ETTask<List<T>> QueryJson<T>(this DBComponent me, long taskId, string json, string collection = null) where T : Entity
 	    {
 		    using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.DB, RandomHelper.RandInt64() % DBComponent.TaskCount))
 		    {
 			    FilterDefinition<T> filterDefinition = new JsonFilterDefinition<T>(json);
-			    IAsyncCursor<T> cursor = await self.GetCollection<T>(collection).FindAsync(filterDefinition);
+			    IAsyncCursor<T> cursor = await me.GetCollection<T>(collection).FindAsync(filterDefinition);
 			    return await cursor.ToListAsync();
 		    }
 	    }
@@ -110,7 +110,7 @@ namespace ET
 
 	    #region Insert
 
-	    public static async ETTask InsertBatch<T>(this DBComponent self, IEnumerable<T> list, string collection = null) where T: Entity
+	    public static async ETTask InsertBatch<T>(this DBComponent me, IEnumerable<T> list, string collection = null) where T: Entity
 	    {
 		    if (collection == null)
 		    {
@@ -119,7 +119,7 @@ namespace ET
 		    
 		    using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.DB, RandomHelper.RandInt64() % DBComponent.TaskCount))
 		    {
-			    await self.GetCollection(collection).InsertManyAsync(list);
+			    await me.GetCollection(collection).InsertManyAsync(list);
 		    }
 	    }
 
@@ -127,7 +127,7 @@ namespace ET
 
 	    #region Save
 
-	    public static async ETTask Save<T>(this DBComponent self, T entity, string collection = null) where T : Entity
+	    public static async ETTask Save<T>(this DBComponent me, T entity, string collection = null) where T : Entity
 	    {
 		    if (entity == null)
 		    {
@@ -143,11 +143,11 @@ namespace ET
 
 		    using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.DB, entity.Id % DBComponent.TaskCount))
 		    {
-			    await self.GetCollection(collection).ReplaceOneAsync(d => d.Id == entity.Id, entity, new ReplaceOptions { IsUpsert = true });
+			    await me.GetCollection(collection).ReplaceOneAsync(d => d.Id == entity.Id, entity, new ReplaceOptions { IsUpsert = true });
 		    }
 	    }
 
-	    public static async ETTask Save<T>(this DBComponent self, long taskId, T entity, string collection = null) where T : Entity
+	    public static async ETTask Save<T>(this DBComponent me, long taskId, T entity, string collection = null) where T : Entity
 	    {
 		    if (entity == null)
 		    {
@@ -163,11 +163,11 @@ namespace ET
 
 		    using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.DB, taskId % DBComponent.TaskCount))
 		    {
-			    await self.GetCollection(collection).ReplaceOneAsync(d => d.Id == entity.Id, entity, new ReplaceOptions { IsUpsert = true });
+			    await me.GetCollection(collection).ReplaceOneAsync(d => d.Id == entity.Id, entity, new ReplaceOptions { IsUpsert = true });
 		    }
 	    }
 
-	    public static async ETTask Save(this DBComponent self, long id, List<Entity> entities)
+	    public static async ETTask Save(this DBComponent me, long id, List<Entity> entities)
 	    {
 		    if (entities == null)
 		    {
@@ -184,64 +184,64 @@ namespace ET
 					    continue;
 				    }
 
-				    await self.GetCollection(entity.GetType().Name)
+				    await me.GetCollection(entity.GetType().Name)
 						    .ReplaceOneAsync(d => d.Id == entity.Id, entity, new ReplaceOptions { IsUpsert = true });
 			    }
 		    }
 	    }
 
-	    public static async ETTask SaveNotWait<T>(this DBComponent self, T entity, long taskId = 0, string collection = null) where T : Entity
+	    public static async ETTask SaveNotWait<T>(this DBComponent me, T entity, long taskId = 0, string collection = null) where T : Entity
 	    {
 		    if (taskId == 0)
 		    {
-			    await self.Save(entity, collection);
+			    await me.Save(entity, collection);
 
 			    return;
 		    }
 
-		    await self.Save(taskId, entity, collection);
+		    await me.Save(taskId, entity, collection);
 	    }
 
 	    #endregion
 
 	    #region Remove
 	    
-	    public static async ETTask<long> Remove<T>(this DBComponent self, long id, string collection = null) where T : Entity
+	    public static async ETTask<long> Remove<T>(this DBComponent me, long id, string collection = null) where T : Entity
 	    {
 		    using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.DB, id % DBComponent.TaskCount))
 		    {
-			    DeleteResult result = await self.GetCollection<T>(collection).DeleteOneAsync(d => d.Id == id);
+			    DeleteResult result = await me.GetCollection<T>(collection).DeleteOneAsync(d => d.Id == id);
 
 			    return result.DeletedCount;
 		    }
 	    }
 
-	    public static async ETTask<long> Remove<T>(this DBComponent self, long taskId, long id, string collection = null) where T : Entity
+	    public static async ETTask<long> Remove<T>(this DBComponent me, long taskId, long id, string collection = null) where T : Entity
 	    {
 		    using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.DB, taskId % DBComponent.TaskCount))
 		    {
-			    DeleteResult result = await self.GetCollection<T>(collection).DeleteOneAsync(d => d.Id == id);
+			    DeleteResult result = await me.GetCollection<T>(collection).DeleteOneAsync(d => d.Id == id);
 
 			    return result.DeletedCount;
 		    }
 	    }
 
-	    public static async ETTask<long> Remove<T>(this DBComponent self, Expression<Func<T, bool>> filter, string collection = null) where T : Entity
+	    public static async ETTask<long> Remove<T>(this DBComponent me, Expression<Func<T, bool>> filter, string collection = null) where T : Entity
 	    {
 		    using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.DB, RandomHelper.RandInt64() % DBComponent.TaskCount))
 		    {
-			    DeleteResult result = await self.GetCollection<T>(collection).DeleteManyAsync(filter);
+			    DeleteResult result = await me.GetCollection<T>(collection).DeleteManyAsync(filter);
 
 			    return result.DeletedCount;
 		    }
 	    }
 
-	    public static async ETTask<long> Remove<T>(this DBComponent self, long taskId, Expression<Func<T, bool>> filter, string collection = null)
+	    public static async ETTask<long> Remove<T>(this DBComponent me, long taskId, Expression<Func<T, bool>> filter, string collection = null)
 			    where T : Entity
 	    {
 		    using (await CoroutineLockComponent.Instance.Wait(CoroutineLockType.DB, taskId % DBComponent.TaskCount))
 		    {
-			    DeleteResult result = await self.GetCollection<T>(collection).DeleteManyAsync(filter);
+			    DeleteResult result = await me.GetCollection<T>(collection).DeleteManyAsync(filter);
 
 			    return result.DeletedCount;
 		    }

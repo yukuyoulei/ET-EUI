@@ -8,24 +8,24 @@ namespace ET
         [ObjectSystem]
         public class DBManagerComponentAwakeSystem: AwakeSystem<DBManagerComponent>
         {
-            public override void Awake(DBManagerComponent self)
+            public override void Awake(DBManagerComponent me)
             {
-                DBManagerComponent.Instance = self;
+                DBManagerComponent.Instance = me;
             }
         }
 
         [ObjectSystem]
         public class DBManagerComponentDestroySystem: DestroySystem<DBManagerComponent>
         {
-            public override void Destroy(DBManagerComponent self)
+            public override void Destroy(DBManagerComponent me)
             {
                 DBManagerComponent.Instance = null;
             }
         }
         
-        public static DBComponent GetZoneDB(this DBManagerComponent self, int zone)
+        public static DBComponent GetZoneDB(this DBManagerComponent me, int zone)
         {
-            DBComponent dbComponent = self.DBComponents[zone];
+            DBComponent dbComponent = me.DBComponents[zone];
             if (dbComponent != null)
             {
                 return dbComponent;
@@ -37,8 +37,8 @@ namespace ET
                 throw new Exception($"zone: {zone} not found mongo connect string");
             }
 
-            dbComponent = self.AddChild<DBComponent, string, string, int>(startZoneConfig.DBConnection, startZoneConfig.DBName, zone);
-            self.DBComponents[zone] = dbComponent;
+            dbComponent = me.AddChild<DBComponent, string, string, int>(startZoneConfig.DBConnection, startZoneConfig.DBName, zone);
+            me.DBComponents[zone] = dbComponent;
             return dbComponent;
         }
     }

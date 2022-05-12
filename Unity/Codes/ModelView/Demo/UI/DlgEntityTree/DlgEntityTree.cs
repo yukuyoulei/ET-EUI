@@ -3,7 +3,6 @@ namespace ET
 {
     public class DlgEntityTree : Entity, IAwake, IUILogic
     {
-
         public DlgEntityTreeViewComponent View { get => this.Parent.GetComponent<DlgEntityTreeViewComponent>(); }
 
         public List<string> lEntityNames;

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace ET
 {
@@ -78,7 +79,11 @@ namespace ET
         {
             public Scene ZoneScene;
         }
-
+        public struct EntityTree
+        {
+            public Scene ZoneScene;
+            public List<string> nodes;
+        }
         public struct LoadingBegin
         {
             public Scene Scene;

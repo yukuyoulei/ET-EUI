@@ -7,7 +7,7 @@ namespace ET
     {
         public class AwakeSystem : AwakeSystem<PlayerComponent>
         {
-            public override void Awake(PlayerComponent self)
+            public override void Awake(PlayerComponent me)
             {
             }
         }
@@ -15,30 +15,30 @@ namespace ET
         [ObjectSystem]
         public class PlayerComponentDestroySystem: DestroySystem<PlayerComponent>
         {
-            public override void Destroy(PlayerComponent self)
+            public override void Destroy(PlayerComponent me)
             {
             }
         }
         
-        public static void Add(this PlayerComponent self, Player player)
+        public static void Add(this PlayerComponent me, Player player)
         {
-            self.idPlayers.Add(player.Id, player);
+            me.idPlayers.Add(player.Id, player);
         }
 
-        public static Player Get(this PlayerComponent self,long id)
+        public static Player Get(this PlayerComponent me,long id)
         {
-            self.idPlayers.TryGetValue(id, out Player gamer);
+            me.idPlayers.TryGetValue(id, out Player gamer);
             return gamer;
         }
 
-        public static void Remove(this PlayerComponent self,long id)
+        public static void Remove(this PlayerComponent me,long id)
         {
-            self.idPlayers.Remove(id);
+            me.idPlayers.Remove(id);
         }
 
-        public static Player[] GetAll(this PlayerComponent self)
+        public static Player[] GetAll(this PlayerComponent me)
         {
-            return self.idPlayers.Values.ToArray();
+            return me.idPlayers.Values.ToArray();
         }
     }
 }

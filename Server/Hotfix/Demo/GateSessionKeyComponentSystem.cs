@@ -3,28 +3,28 @@
     [FriendClass(typeof(GateSessionKeyComponent))]
     public static class GateSessionKeyComponentSystem
     {
-        public static void Add(this GateSessionKeyComponent self, long key, string account)
+        public static void Add(this GateSessionKeyComponent me, long key, string account)
         {
-            self.sessionKey.Add(key, account);
-            self.TimeoutRemoveKey(key).Coroutine();
+            me.sessionKey.Add(key, account);
+            me.TimeoutRemoveKey(key).Coroutine();
         }
 
-        public static string Get(this GateSessionKeyComponent self, long key)
+        public static string Get(this GateSessionKeyComponent me, long key)
         {
             string account = null;
-            self.sessionKey.TryGetValue(key, out account);
+            me.sessionKey.TryGetValue(key, out account);
             return account;
         }
 
-        public static void Remove(this GateSessionKeyComponent self, long key)
+        public static void Remove(this GateSessionKeyComponent me, long key)
         {
-            self.sessionKey.Remove(key);
+            me.sessionKey.Remove(key);
         }
 
-        private static async ETTask TimeoutRemoveKey(this GateSessionKeyComponent self, long key)
+        private static async ETTask TimeoutRemoveKey(this GateSessionKeyComponent me, long key)
         {
             await TimerComponent.Instance.WaitAsync(20000);
-            self.sessionKey.Remove(key);
+            me.sessionKey.Remove(key);
         }
     }
 }

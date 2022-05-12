@@ -4,9 +4,9 @@
     {
         public class UnitGateComponentAwakeSystem : AwakeSystem<UnitGateComponent, long>
         {
-            public override void Awake(UnitGateComponent self, long a)
+            public override void Awake(UnitGateComponent me, long a)
             {
-                self.GateSessionActorId = a;
+                me.GateSessionActorId = a;
             }
         }
     }

@@ -6,13 +6,13 @@ namespace ET
 {
     public class HttpComponentAwakeSystem : AwakeSystem<HttpComponent, string>
     {
-        public override void Awake(HttpComponent self, string address)
+        public override void Awake(HttpComponent me, string address)
         {
             try
             {
-                self.Load();
+                me.Load();
                 
-                self.Listener = new HttpListener();
+                me.Listener = new HttpListener();
 
                 foreach (string s in address.Split(';'))
                 {
@@ -20,12 +20,12 @@ namespace ET
                     {
                         continue;
                     }
-                    self.Listener.Prefixes.Add(s);
+                    me.Listener.Prefixes.Add(s);
                 }
 
-                self.Listener.Start();
+                me.Listener.Start();
 
-                self.Accept().Coroutine();
+                me.Accept().Coroutine();
             }
             catch (HttpListenerException e)
             {
@@ -37,32 +37,32 @@ namespace ET
     [ObjectSystem]
     public class HttpComponentLoadSystem: LoadSystem<HttpComponent>
     {
-        public override void Load(HttpComponent self)
+        public override void Load(HttpComponent me)
         {
-            self.Load();
+            me.Load();
         }
     }
 
     [ObjectSystem]
     public class HttpComponentDestroySystem: DestroySystem<HttpComponent>
     {
-        public override void Destroy(HttpComponent self)
+        public override void Destroy(HttpComponent me)
         {
-            self.Listener.Stop();
-            self.Listener.Close();
+            me.Listener.Stop();
+            me.Listener.Close();
         }
     }
     
     [FriendClass(typeof(HttpComponent))]
     public static class HttpComponentSystem
     {
-        public static void Load(this HttpComponent self)
+        public static void Load(this HttpComponent me)
         {
-            self.dispatcher = new Dictionary<string, IHttpHandler>();
+            me.dispatcher = new Dictionary<string, IHttpHandler>();
 
             List<Type> types = EventSystem.Instance.GetTypes(typeof (HttpHandlerAttribute));
 
-            SceneType sceneType = self.GetParent<Scene>().SceneType;
+            SceneType sceneType = me.GetParent<Scene>().SceneType;
 
             foreach (Type type in types)
             {
@@ -86,19 +86,19 @@ namespace ET
                 {
                     throw new Exception($"HttpHandler handler not inherit IHttpHandler class: {obj.GetType().FullName}");
                 }
-                self.dispatcher.Add(httpHandlerAttribute.Path, ihttpHandler);
+                me.dispatcher.Add(httpHandlerAttribute.Path, ihttpHandler);
             }
         }
         
-        public static async ETTask Accept(this HttpComponent self)
+        public static async ETTask Accept(this HttpComponent me)
         {
-            long instanceId = self.InstanceId;
-            while (self.InstanceId == instanceId)
+            long instanceId = me.InstanceId;
+            while (me.InstanceId == instanceId)
             {
                 try
                 {
-                    HttpListenerContext context = await self.Listener.GetContextAsync();
-                    self.Handle(context).Coroutine();
+                    HttpListenerContext context = await me.Listener.GetContextAsync();
+                    me.Handle(context).Coroutine();
                 }
                 catch (Exception e)
                 {
@@ -107,14 +107,14 @@ namespace ET
             }
         }
 
-        public static async ETTask Handle(this HttpComponent self, HttpListenerContext context)
+        public static async ETTask Handle(this HttpComponent me, HttpListenerContext context)
         {
             try
             {
                 IHttpHandler handler;
-                if (self.dispatcher.TryGetValue(context.Request.Url.AbsolutePath, out handler))
+                if (me.dispatcher.TryGetValue(context.Request.Url.AbsolutePath, out handler))
                 {
-                    await handler.Handle(self.Domain, context);
+                    await handler.Handle(me.Domain, context);
                 }
             }
             catch (Exception e)

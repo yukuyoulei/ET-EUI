@@ -493,4 +493,32 @@ namespace ET
 
 	}
 
+	[ResponseType(nameof(G2C_EntitiesGetResponse))]
+	[Message(OuterOpcode.C2G_EntitiesGetRequest)]
+	[ProtoContract]
+	public partial class C2G_EntitiesGetRequest: Object, IRequest
+	{
+		[ProtoMember(1)]
+		public int RpcId { get; set; }
+
+	}
+
+	[Message(OuterOpcode.G2C_EntitiesGetResponse)]
+	[ProtoContract]
+	public partial class G2C_EntitiesGetResponse: Object, IResponse
+	{
+		[ProtoMember(90)]
+		public int RpcId { get; set; }
+
+		[ProtoMember(91)]
+		public int Error { get; set; }
+
+		[ProtoMember(92)]
+		public string Message { get; set; }
+
+		[ProtoMember(1)]
+		public List<string> entities = new List<string>();
+
+	}
+
 }

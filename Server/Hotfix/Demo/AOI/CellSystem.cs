@@ -6,27 +6,27 @@ namespace ET
     [ObjectSystem]
     public class CellDestroySystem: DestroySystem<Cell>
     {
-        public override void Destroy(Cell self)
+        public override void Destroy(Cell me)
         {
-            self.AOIUnits.Clear();
+            me.AOIUnits.Clear();
 
-            self.SubsEnterEntities.Clear();
+            me.SubsEnterEntities.Clear();
 
-            self.SubsLeaveEntities.Clear();
+            me.SubsLeaveEntities.Clear();
         }
     }
 
     [FriendClass(typeof(Cell))]
     public static class CellSystem
     {
-        public static void Add(this Cell self, AOIEntity aoiEntity)
+        public static void Add(this Cell me, AOIEntity aoiEntity)
         {
-            self.AOIUnits.Add(aoiEntity.Id, aoiEntity);
+            me.AOIUnits.Add(aoiEntity.Id, aoiEntity);
         }
         
-        public static void Remove(this Cell self, AOIEntity aoiEntity)
+        public static void Remove(this Cell me, AOIEntity aoiEntity)
         {
-            self.AOIUnits.Remove(aoiEntity.Id);
+            me.AOIUnits.Remove(aoiEntity.Id);
         }
         
         public static string CellIdToString(this long cellId)

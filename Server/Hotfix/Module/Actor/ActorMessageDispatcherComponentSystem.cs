@@ -5,28 +5,28 @@ namespace ET
     [ObjectSystem]
     public class ActorMessageDispatcherComponentAwakeSystem: AwakeSystem<ActorMessageDispatcherComponent>
     {
-        public override void Awake(ActorMessageDispatcherComponent self)
+        public override void Awake(ActorMessageDispatcherComponent me)
         {
-            ActorMessageDispatcherComponent.Instance = self;
-            self.Awake();
+            ActorMessageDispatcherComponent.Instance = me;
+            me.Awake();
         }
     }
 
     [ObjectSystem]
     public class ActorMessageDispatcherComponentLoadSystem: LoadSystem<ActorMessageDispatcherComponent>
     {
-        public override void Load(ActorMessageDispatcherComponent self)
+        public override void Load(ActorMessageDispatcherComponent me)
         {
-            self.Load();
+            me.Load();
         }
     }
 
     [ObjectSystem]
     public class ActorMessageDispatcherComponentDestroySystem: DestroySystem<ActorMessageDispatcherComponent>
     {
-        public override void Destroy(ActorMessageDispatcherComponent self)
+        public override void Destroy(ActorMessageDispatcherComponent me)
         {
-            self.ActorMessageHandlers.Clear();
+            me.ActorMessageHandlers.Clear();
             ActorMessageDispatcherComponent.Instance = null;
         }
     }
@@ -37,14 +37,14 @@ namespace ET
     [FriendClass(typeof(ActorMessageDispatcherComponent))]
     public static class ActorMessageDispatcherComponentHelper
     {
-        public static void Awake(this ActorMessageDispatcherComponent self)
+        public static void Awake(this ActorMessageDispatcherComponent me)
         {
-            self.Load();
+            me.Load();
         }
 
-        public static void Load(this ActorMessageDispatcherComponent self)
+        public static void Load(this ActorMessageDispatcherComponent me)
         {
-            self.ActorMessageHandlers.Clear();
+            me.ActorMessageHandlers.Clear();
 
             var types = Game.EventSystem.GetTypes(typeof (ActorMessageHandlerAttribute));
             foreach (Type type in types)
@@ -69,7 +69,7 @@ namespace ET
                     }
                 }
 
-                self.ActorMessageHandlers.Add(messageType, imHandler);
+                me.ActorMessageHandlers.Add(messageType, imHandler);
             }
         }
 
@@ -77,9 +77,9 @@ namespace ET
         /// 分发actor消息
         /// </summary>
         public static async ETTask Handle(
-            this ActorMessageDispatcherComponent self, Entity entity, object message, Action<IActorResponse> reply)
+            this ActorMessageDispatcherComponent me, Entity entity, object message, Action<IActorResponse> reply)
         {
-            if (!self.ActorMessageHandlers.TryGetValue(message.GetType(), out IMActorHandler handler))
+            if (!me.ActorMessageHandlers.TryGetValue(message.GetType(), out IMActorHandler handler))
             {
                 throw new Exception($"not found message handler: {message}");
             }
@@ -87,9 +87,9 @@ namespace ET
             await handler.Handle(entity, message, reply);
         }
 
-        public static bool TryGetHandler(this ActorMessageDispatcherComponent self,Type type, out IMActorHandler actorHandler)
+        public static bool TryGetHandler(this ActorMessageDispatcherComponent me,Type type, out IMActorHandler actorHandler)
         {
-            return self.ActorMessageHandlers.TryGetValue(type, out actorHandler);
+            return me.ActorMessageHandlers.TryGetValue(type, out actorHandler);
         }
     }
 }

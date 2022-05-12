@@ -6,15 +6,15 @@ namespace ET
     [Timer(TimerType.ActorMessageSenderChecker)]
     public class ActorMessageSenderChecker: ATimer<ActorMessageSenderComponent>
     {
-        public override void Run(ActorMessageSenderComponent self)
+        public override void Run(ActorMessageSenderComponent me)
         {
             try
             {
-                self.Check();
+                me.Check();
             }
             catch (Exception e)
             {
-                Log.Error($"move timer error: {self.Id}\n{e}");
+                Log.Error($"move timer error: {me.Id}\n{e}");
             }
         }
     }
@@ -22,50 +22,50 @@ namespace ET
     [ObjectSystem]
     public class ActorMessageSenderComponentAwakeSystem: AwakeSystem<ActorMessageSenderComponent>
     {
-        public override void Awake(ActorMessageSenderComponent self)
+        public override void Awake(ActorMessageSenderComponent me)
         {
-            ActorMessageSenderComponent.Instance = self;
+            ActorMessageSenderComponent.Instance = me;
 
-            self.TimeoutCheckTimer = TimerComponent.Instance.NewRepeatedTimer(1000, TimerType.ActorMessageSenderChecker, self);
+            me.TimeoutCheckTimer = TimerComponent.Instance.NewRepeatedTimer(1000, TimerType.ActorMessageSenderChecker, me);
         }
     }
 
     [ObjectSystem]
     public class ActorMessageSenderComponentDestroySystem: DestroySystem<ActorMessageSenderComponent>
     {
-        public override void Destroy(ActorMessageSenderComponent self)
+        public override void Destroy(ActorMessageSenderComponent me)
         {
             ActorMessageSenderComponent.Instance = null;
-            TimerComponent.Instance.Remove(ref self.TimeoutCheckTimer);
-            self.TimeoutCheckTimer = 0;
-            self.TimeoutActorMessageSenders.Clear();
+            TimerComponent.Instance.Remove(ref me.TimeoutCheckTimer);
+            me.TimeoutCheckTimer = 0;
+            me.TimeoutActorMessageSenders.Clear();
         }
     }
 
     [FriendClass(typeof(ActorMessageSenderComponent))]
     public static class ActorMessageSenderComponentSystem
     {
-        public static void Run(ActorMessageSender self, IActorResponse response)
+        public static void Run(ActorMessageSender me, IActorResponse response)
         {
             if (response.Error == ErrorCore.ERR_ActorTimeout)
             {
-                self.Tcs.SetException(new Exception($"Rpc error: request, 注意Actor消息超时，请注意查看是否死锁或者没有reply: actorId: {self.ActorId} {self.MemoryStream.ToActorMessage()}, response: {response}"));
+                me.Tcs.SetException(new Exception($"Rpc error: request, 注意Actor消息超时，请注意查看是否死锁或者没有reply: actorId: {me.ActorId} {me.MemoryStream.ToActorMessage()}, response: {response}"));
                 return;
             }
 
-            if (self.NeedException && ErrorCore.IsRpcNeedThrowException(response.Error))
+            if (me.NeedException && ErrorCore.IsRpcNeedThrowException(response.Error))
             {
-                self.Tcs.SetException(new Exception($"Rpc error: actorId: {self.ActorId} request: {self.MemoryStream.ToActorMessage()}, response: {response}"));
+                me.Tcs.SetException(new Exception($"Rpc error: actorId: {me.ActorId} request: {me.MemoryStream.ToActorMessage()}, response: {response}"));
                 return;
             }
 
-            self.Tcs.SetResult(response);
+            me.Tcs.SetResult(response);
         }
         
-        public static void Check(this ActorMessageSenderComponent self)
+        public static void Check(this ActorMessageSenderComponent me)
         {
             long timeNow = TimeHelper.ServerNow();
-            foreach ((int key, ActorMessageSender value) in self.requestCallback)
+            foreach ((int key, ActorMessageSender value) in me.requestCallback)
             {
                 // 因为是顺序发送的，所以，检测到第一个不超时的就退出
                 if (timeNow < value.CreateTime + ActorMessageSenderComponent.TIMEOUT_TIME)
@@ -73,13 +73,13 @@ namespace ET
                     break;
                 }
 
-                self.TimeoutActorMessageSenders.Add(key);
+                me.TimeoutActorMessageSenders.Add(key);
             }
 
-            foreach (int rpcId in self.TimeoutActorMessageSenders)
+            foreach (int rpcId in me.TimeoutActorMessageSenders)
             {
-                ActorMessageSender actorMessageSender = self.requestCallback[rpcId];
-                self.requestCallback.Remove(rpcId);
+                ActorMessageSender actorMessageSender = me.requestCallback[rpcId];
+                me.requestCallback.Remove(rpcId);
                 try
                 {
                     IActorResponse response = ActorHelper.CreateResponse((IActorRequest)actorMessageSender.MemoryStream.ToActorMessage(), ErrorCore.ERR_ActorTimeout);
@@ -91,10 +91,10 @@ namespace ET
                 }
             }
 
-            self.TimeoutActorMessageSenders.Clear();
+            me.TimeoutActorMessageSenders.Clear();
         }
 
-        public static void Send(this ActorMessageSenderComponent self, long actorId, IMessage message)
+        public static void Send(this ActorMessageSenderComponent me, long actorId, IMessage message)
         {
             if (actorId == 0)
             {
@@ -106,7 +106,7 @@ namespace ET
             session.Send(processActorId.ActorId, message);
         }
         
-        public static void Send(this ActorMessageSenderComponent self, long actorId, MemoryStream memoryStream)
+        public static void Send(this ActorMessageSenderComponent me, long actorId, MemoryStream memoryStream)
         {
             if (actorId == 0)
             {
@@ -119,19 +119,19 @@ namespace ET
         }
 
 
-        public static int GetRpcId(this ActorMessageSenderComponent self)
+        public static int GetRpcId(this ActorMessageSenderComponent me)
         {
-            return ++self.RpcId;
+            return ++me.RpcId;
         }
 
         public static async ETTask<IActorResponse> Call(
-                this ActorMessageSenderComponent self,
+                this ActorMessageSenderComponent me,
                 long actorId,
                 IActorRequest request,
                 bool needException = true
         )
         {
-            request.RpcId = self.GetRpcId();
+            request.RpcId = me.GetRpcId();
             
             if (actorId == 0)
             {
@@ -140,11 +140,11 @@ namespace ET
 
             (ushort _, MemoryStream stream) = MessageSerializeHelper.MessageToStream(request);
 
-            return await self.Call(actorId, request.RpcId, stream, needException);
+            return await me.Call(actorId, request.RpcId, stream, needException);
         }
         
         public static async ETTask<IActorResponse> Call(
-                this ActorMessageSenderComponent self,
+                this ActorMessageSenderComponent me,
                 long actorId,
                 int rpcId,
                 MemoryStream memoryStream,
@@ -158,9 +158,9 @@ namespace ET
 
             var tcs = ETTask<IActorResponse>.Create(true);
             
-            self.requestCallback.Add(rpcId, new ActorMessageSender(actorId, memoryStream, tcs, needException));
+            me.requestCallback.Add(rpcId, new ActorMessageSender(actorId, memoryStream, tcs, needException));
             
-            self.Send(actorId, memoryStream);
+            me.Send(actorId, memoryStream);
 
             long beginTime = TimeHelper.ServerFrameTime();
             IActorResponse response = await tcs;
@@ -175,15 +175,15 @@ namespace ET
             return response;
         }
 
-        public static void RunMessage(this ActorMessageSenderComponent self, long actorId, IActorResponse response)
+        public static void RunMessage(this ActorMessageSenderComponent me, long actorId, IActorResponse response)
         {
             ActorMessageSender actorMessageSender;
-            if (!self.requestCallback.TryGetValue(response.RpcId, out actorMessageSender))
+            if (!me.requestCallback.TryGetValue(response.RpcId, out actorMessageSender))
             {
                 return;
             }
 
-            self.requestCallback.Remove(response.RpcId);
+            me.requestCallback.Remove(response.RpcId);
             
             Run(actorMessageSender, response);
         }

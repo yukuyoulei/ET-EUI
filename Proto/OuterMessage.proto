@@ -238,4 +238,17 @@ message M2C_TransferMap // IActorLocationResponse
 	int32 Error = 91;
 	string Message = 92;
 }
- 
+
+
+//ResponseType G2C_EntitiesGetResponse
+message C2G_EntitiesGetRequest // IRequest
+{
+	int32 RpcId = 1;
+}
+message G2C_EntitiesGetResponse // IResponse
+{
+	int32 RpcId = 90;
+	int32 Error = 91;
+	string Message = 92;
+	repeated string entities = 1;
+}

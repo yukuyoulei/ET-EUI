@@ -1,15 +1,34 @@
-﻿using System.Runtime.InteropServices;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ET
 {
+	[FriendClass(typeof(GateMapComponent))]
+	[MessageHandler]
+	public class C2G_EntitiesGetHandler : AMRpcHandler<C2G_EntitiesGetRequest, G2C_EntitiesGetResponse>
+	{
+		protected override async ETTask Run(Session session, C2G_EntitiesGetRequest request, G2C_EntitiesGetResponse response, Action reply)
+		{
+			foreach (var t in EntityTreeHelper.GetClientEntity())
+			{
+				response.entities.Add($"{t.Key}{GetTab(t.Key)}{t.Value}");
+			}
+			reply();
+			await ETTask.CompletedTask;
+		}
+
+		private static string GetTab(int tabcount)
+		{
+			var res = "";
+			for (var i = 0; i < tabcount; i++)
+				res += "  ";
+			return res;
+		}
+	}
+
 	public static class EntityTreeHelper
 	{
-		public static KeyValuePair<int, string> CreateNode(this List<KeyValuePair<int, string>> list, int layer, string node)
+		private static KeyValuePair<int, string> CreateNode(this List<KeyValuePair<int, string>> list, int layer, string node)
 		{
 			var n = new KeyValuePair<int, string>(layer, node);
 			list.Add(n);
@@ -40,13 +59,6 @@ namespace ET
 					GatherEntities(res, c, res.CreateNode(parent.Key + 1, "○" + c.GetType().Name));
 				}
 			}
-		}
-
-		public static async ETTask Request(Scene zoneScene)
-		{
-			var s = zoneScene.GetComponent<SessionComponent>().Session;
-			var req = (G2C_EntitiesGetResponse)await s.Call(new C2G_EntitiesGetRequest());
-			Game.EventSystem.PublishAsync(new EventType.EntityTree() { ZoneScene = zoneScene, nodes = req.entities }).Coroutine();
 		}
 	}
 }

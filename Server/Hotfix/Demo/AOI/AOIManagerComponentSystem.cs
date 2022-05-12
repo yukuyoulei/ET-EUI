@@ -7,7 +7,7 @@ namespace ET
     [FriendClass(typeof(Cell))]
     public static class AOIManagerComponentSystem
     {
-        public static void Add(this AOIManagerComponent self, AOIEntity aoiEntity, float x, float y)
+        public static void Add(this AOIManagerComponent me, AOIEntity aoiEntity, float x, float y)
         {
             int cellX = (int)(x * 1000) / AOIManagerComponent.CellSize;
             int cellY = (int)(y * 1000) / AOIManagerComponent.CellSize;
@@ -22,19 +22,19 @@ namespace ET
             // 遍历EnterCell
             foreach (long cellId in aoiEntity.SubEnterCells)
             {
-                Cell cell = self.GetCell(cellId);
+                Cell cell = me.GetCell(cellId);
                 aoiEntity.SubEnter(cell);
             }
 
             // 遍历LeaveCell
             foreach (long cellId in aoiEntity.SubLeaveCells)
             {
-                Cell cell = self.GetCell(cellId);
+                Cell cell = me.GetCell(cellId);
                 aoiEntity.SubLeave(cell);
             }
 
             // 自己加入的Cell
-            Cell selfCell = self.GetCell(AOIHelper.CreateCellId(cellX, cellY));
+            Cell selfCell = me.GetCell(AOIHelper.CreateCellId(cellX, cellY));
             aoiEntity.Cell = selfCell;
             selfCell.Add(aoiEntity);
             // 通知订阅该Cell Enter的Unit
@@ -44,7 +44,7 @@ namespace ET
             }
         }
 
-        public static void Remove(this AOIManagerComponent self, AOIEntity aoiEntity)
+        public static void Remove(this AOIManagerComponent me, AOIEntity aoiEntity)
         {
             if (aoiEntity.Cell == null)
             {
@@ -61,13 +61,13 @@ namespace ET
             // 通知自己订阅的Enter Cell，清理自己
             foreach (long cellId in aoiEntity.SubEnterCells)
             {
-                Cell cell = self.GetCell(cellId);
+                Cell cell = me.GetCell(cellId);
                 aoiEntity.UnSubEnter(cell);
             }
 
             foreach (long cellId in aoiEntity.SubLeaveCells)
             {
-                Cell cell = self.GetCell(cellId);
+                Cell cell = me.GetCell(cellId);
                 aoiEntity.UnSubLeave(cell);
             }
 
@@ -83,12 +83,12 @@ namespace ET
             }
         }
 
-        private static Cell GetCell(this AOIManagerComponent self, long cellId)
+        private static Cell GetCell(this AOIManagerComponent me, long cellId)
         {
-            Cell cell = self.GetChild<Cell>(cellId);
+            Cell cell = me.GetChild<Cell>(cellId);
             if (cell == null)
             {
-                cell = self.AddChildWithId<Cell>(cellId);
+                cell = me.AddChildWithId<Cell>(cellId);
             }
 
             return cell;
@@ -123,7 +123,7 @@ namespace ET
             }
         }
 
-        public static void Move(this AOIManagerComponent self, AOIEntity aoiEntity, int cellX, int cellY)
+        public static void Move(this AOIManagerComponent me, AOIEntity aoiEntity, int cellX, int cellY)
         {
             long newCellId = AOIHelper.CreateCellId(cellX, cellY);
             if (aoiEntity.Cell.Id == newCellId) // cell没有变化
@@ -132,7 +132,7 @@ namespace ET
             }
 
             // 自己加入新的Cell
-            Cell newCell = self.GetCell(newCellId);
+            Cell newCell = me.GetCell(newCellId);
             Move(aoiEntity, newCell, aoiEntity.Cell);
 
             AOIHelper.CalcEnterAndLeaveCell(aoiEntity, cellX, cellY, aoiEntity.enterHashSet, aoiEntity.leaveHashSet);
@@ -145,7 +145,7 @@ namespace ET
                     continue;
                 }
 
-                Cell cell = self.GetCell(cellId);
+                Cell cell = me.GetCell(cellId);
                 aoiEntity.SubLeave(cell);
             }
 
@@ -153,7 +153,7 @@ namespace ET
             aoiEntity.SubLeaveCells.ExceptWith(aoiEntity.leaveHashSet);
             foreach (long cellId in aoiEntity.SubLeaveCells)
             {
-                Cell cell = self.GetCell(cellId);
+                Cell cell = me.GetCell(cellId);
                 aoiEntity.UnSubLeave(cell);
             }
 
@@ -168,7 +168,7 @@ namespace ET
                     continue;
                 }
 
-                Cell cell = self.GetCell(cellId);
+                Cell cell = me.GetCell(cellId);
                 aoiEntity.SubEnter(cell);
             }
 
@@ -176,7 +176,7 @@ namespace ET
             aoiEntity.SubEnterCells.ExceptWith(aoiEntity.enterHashSet);
             foreach (long cellId in aoiEntity.SubEnterCells)
             {
-                Cell cell = self.GetCell(cellId);
+                Cell cell = me.GetCell(cellId);
                 aoiEntity.UnSubEnter(cell);
             }
 
