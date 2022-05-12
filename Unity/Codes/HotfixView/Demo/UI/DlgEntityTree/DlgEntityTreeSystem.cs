@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 namespace ET
 {
+	[FriendClass(typeof(ServerEntityNodes))]
 	[FriendClass(typeof(DlgEntityTree))]
 	public static class DlgEntityTreeSystem
 	{
@@ -13,7 +14,7 @@ namespace ET
 		{
 			me.View.EBtnGatherButton.AddListener(() =>
 			{
-				me.OnGather();
+				me.OnGather(null);
 			});
 
 			me.View.ELoopScrollList_EntityNameLoopVerticalScrollRect.AddItemRefreshListener((tr, idx) =>
@@ -28,13 +29,20 @@ namespace ET
 			});
 		}
 
-		public static void OnGather(this DlgEntityTree me)
+		public static void OnGather(this DlgEntityTree me, List<string> l)
 		{
-			var tree = EntityTreeHelper.GetClientEntity();
-			me.lEntityNames = new List<string>();
-			foreach (var node in tree)
+			if (l == null)
 			{
-				me.lEntityNames.Add($"[{node.Key}]" + GetTab(node.Key) + node.Value);
+				var tree = EntityTreeHelper.GetClientEntity();
+				me.lEntityNames = new List<string>();
+				foreach (var node in tree)
+				{
+					me.lEntityNames.Add($"[{node.Key}]" + GetTab(node.Key) + node.Value);
+				}
+			}
+			else
+			{
+				me.lEntityNames = l;
 			}
 
 			me.RemoveUIScrollItems(ref me.dItems);
@@ -45,7 +53,7 @@ namespace ET
 		}
 		public static void ShowWindow(this DlgEntityTree me, Entity contextData = null)
 		{
-			me.OnGather();
+			me.OnGather((contextData as ServerEntityNodes).nodes);
 		}
 
 		public static void HideWindow(this DlgEntityTree me, Entity contextData = null)
