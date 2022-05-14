@@ -15,7 +15,6 @@ namespace ET
         {
             me.View.E_EnterMapButton.AddListener(() =>
             {
-                //await me.OnEnterMapClickHandler();
                 me.ZoneScene().GetComponent<UIComponent>().ShowWindow(WindowID.WindowID_Play);
             });
 
@@ -38,9 +37,5 @@ namespace ET
 
         }
 
-        public static async ETTask OnEnterMapClickHandler(this DlgLobby me)
-        {
-            await EnterMapHelper.EnterMapAsync(me.ZoneScene());
-        }
     }
 }

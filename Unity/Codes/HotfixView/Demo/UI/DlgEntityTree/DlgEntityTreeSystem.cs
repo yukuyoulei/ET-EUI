@@ -53,7 +53,7 @@ namespace ET
 		}
 		public static void ShowWindow(this DlgEntityTree me, Entity contextData = null)
 		{
-			me.OnGather((contextData as ServerEntityNodes).nodes);
+			me.OnGather(contextData == null ? null : (contextData as ServerEntityNodes).nodes);
 		}
 
 		public static void HideWindow(this DlgEntityTree me, Entity contextData = null)

@@ -78,7 +78,7 @@ namespace ET
 
 			try
 			{
-				me.Animator.SetFloat("MotionSpeed", me.MontionSpeed);
+				me.Animator.SetFloat("Speed", me.MontionSpeed);
 
 				me.Animator.SetTrigger(me.MotionType.ToString());
 
