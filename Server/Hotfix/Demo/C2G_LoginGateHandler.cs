@@ -18,11 +18,15 @@ namespace ET
 				reply();
 				return;
 			}
-			
+
 			session.RemoveComponent<SessionAcceptTimeoutComponent>();
 
 			PlayerComponent playerComponent = scene.GetComponent<PlayerComponent>();
 			Player player = playerComponent.AddChild<Player, string>(account);
+			var zonedb = DBManagerComponent.Instance.GetZoneDB(scene.Zone);
+			var ps = await zonedb.Query<Player>(p => p.Account == account);
+			if (ps.Count == 0)
+				await zonedb.Save(player);
 			playerComponent.Add(player);
 			session.AddComponent<SessionPlayerComponent>().PlayerId = player.Id;
 			session.AddComponent<MailBoxComponent, MailboxType>(MailboxType.GateSession);
